@@ -514,3 +514,112 @@ export const sampleRoadmapWeeks: RoadmapWeek[] = [
     ]
   }
 ];
+
+export const sampleDailyPlan: import('../types').DailyPlanTask[] = [
+  {
+    id: "dp-01",
+    title: "Percentages & Base Values: Successive Shifts & Traps",
+    subject: "Quantitative Aptitude",
+    topic: "Percentages & Ratios",
+    estimatedMinutes: 45,
+    completed: false,
+    assignedByMentor: true,
+    mentorNote: "Focus on the [x / (100 + x)] denominator shift rule. Solve the 5 practice MCQs.",
+    taskType: "practice"
+  },
+  {
+    id: "dp-02",
+    title: "Circular Seating: Inward vs Outward Facing Arrangements",
+    subject: "Logical Reasoning",
+    topic: "Circular Seating Arrangements",
+    estimatedMinutes: 40,
+    completed: false,
+    assignedByMentor: true,
+    mentorNote: "Draw clear outward arrows so right=clockwise is never mixed up.",
+    taskType: "concept"
+  },
+  {
+    id: "dp-03",
+    title: "Abstract Reasoning: 10 Visual Series Pattern Drills",
+    subject: "Abstract Reasoning",
+    topic: "Series Completion",
+    estimatedMinutes: 25,
+    completed: false,
+    assignedByMentor: false,
+    taskType: "practice"
+  },
+  {
+    id: "dp-04",
+    title: "Read Speed Math Notes (Formula Sheet)",
+    subject: "Quantitative Aptitude",
+    topic: "Speed Calculation",
+    estimatedMinutes: 20,
+    completed: true,
+    assignedByMentor: true,
+    mentorNote: "Memorize fractional equivalents 1/2 to 1/16.",
+    taskType: "revision"
+  }
+];
+
+export const sampleSyllabusSections: import('../types').SyllabusSection[] = [
+  {
+    subject: "Logical Reasoning",
+    totalQuestions: 75,
+    totalMarks: 75,
+    recommendedMinutes: 70,
+    topics: [
+      { id: "lr-top-1", name: "Linear Seating Arrangements (Single & Dual Row)", status: "Completed", targetQuestions: 50, completedQuestions: 52, weightageRank: "High" },
+      { id: "lr-top-2", name: "Circular Seating Arrangements (Inward & Outward Mixed)", status: "In Progress", targetQuestions: 60, completedQuestions: 28, weightageRank: "High", keyNotes: "Crucial CET topic; right = clockwise when facing outward." },
+      { id: "lr-top-3", name: "Floor & Box Puzzles (Multi-Variable Scheduling)", status: "Not Started", targetQuestions: 60, completedQuestions: 0, weightageRank: "High" },
+      { id: "lr-top-4", name: "Syllogisms (Reverse & Possibility Rules)", status: "Completed", targetQuestions: 40, completedQuestions: 40, weightageRank: "High" },
+      { id: "lr-top-5", name: "Coding-Decoding & Substitution", status: "Completed", targetQuestions: 30, completedQuestions: 30, weightageRank: "Medium" },
+      { id: "lr-top-6", name: "Blood Relations & Coded Generations", status: "In Progress", targetQuestions: 35, completedQuestions: 15, weightageRank: "Medium" },
+      { id: "lr-top-7", name: "Direction Sense & Shadow Tests", status: "Completed", targetQuestions: 25, completedQuestions: 25, weightageRank: "Foundational" },
+      { id: "lr-top-8", name: "Input-Output Machine Sequencing", status: "Not Started", targetQuestions: 40, completedQuestions: 0, weightageRank: "Medium" },
+      { id: "lr-top-9", name: "Critical Reasoning (Statement-Assumption & Inferences)", status: "Not Started", targetQuestions: 45, completedQuestions: 0, weightageRank: "High" }
+    ]
+  },
+  {
+    subject: "Abstract Reasoning",
+    totalQuestions: 25,
+    totalMarks: 25,
+    recommendedMinutes: 20,
+    topics: [
+      { id: "ar-top-1", name: "Visual Series Completion & Rotation Cycles", status: "In Progress", targetQuestions: 50, completedQuestions: 35, weightageRank: "High" },
+      { id: "ar-top-2", name: "Figure Analogies & Inversion Pairs", status: "In Progress", targetQuestions: 40, completedQuestions: 20, weightageRank: "High" },
+      { id: "ar-top-3", name: "Odd Figure Out (Classification & Elements Count)", status: "Not Started", targetQuestions: 35, completedQuestions: 0, weightageRank: "Medium" },
+      { id: "ar-top-4", name: "Paper Folding, Pattern Unfolding & Dot Situations", status: "Not Started", targetQuestions: 30, completedQuestions: 0, weightageRank: "Medium" }
+    ]
+  },
+  {
+    subject: "Quantitative Aptitude",
+    totalQuestions: 50,
+    totalMarks: 50,
+    recommendedMinutes: 40,
+    topics: [
+      { id: "qa-top-1", name: "Percentages, Reverse Base Values & Successive Shifts", status: "In Progress", targetQuestions: 60, completedQuestions: 32, weightageRank: "High", keyNotes: "Always verify new denominator (100 + x)." },
+      { id: "qa-top-2", name: "Profit, Loss, Discount & False Weights", status: "Not Started", targetQuestions: 45, completedQuestions: 0, weightageRank: "High" },
+      { id: "qa-top-3", name: "Ratio, Proportion & Partnerships", status: "Completed", targetQuestions: 40, completedQuestions: 40, weightageRank: "High" },
+      { id: "qa-top-4", name: "Averages, Weighted Mean & Alligations", status: "Not Started", targetQuestions: 40, completedQuestions: 0, weightageRank: "Medium" },
+      { id: "qa-top-5", name: "Time, Speed, Distance, Trains & Relative Velocity", status: "Not Started", targetQuestions: 50, completedQuestions: 0, weightageRank: "High" },
+      { id: "qa-top-6", name: "Time & Work, Efficiency & Pipes-Cisterns", status: "Not Started", targetQuestions: 45, completedQuestions: 0, weightageRank: "High" },
+      { id: "qa-top-7", name: "Simple & Compound Interest", status: "Not Started", targetQuestions: 30, completedQuestions: 0, weightageRank: "Medium" },
+      { id: "qa-top-8", name: "Data Interpretation: Tables & Missing Data", status: "Not Started", targetQuestions: 50, completedQuestions: 0, weightageRank: "High" },
+      { id: "qa-top-9", name: "Data Interpretation: Bar, Line & Pie Charts", status: "Not Started", targetQuestions: 50, completedQuestions: 0, weightageRank: "High" }
+    ]
+  },
+  {
+    subject: "Verbal Ability",
+    totalQuestions: 50,
+    totalMarks: 50,
+    recommendedMinutes: 20,
+    topics: [
+      { id: "va-top-1", name: "Reading Comprehension: Main Idea, Inference & Tone", status: "In Progress", targetQuestions: 60, completedQuestions: 24, weightageRank: "High" },
+      { id: "va-top-2", name: "Vocabulary: Synonyms, Antonyms & Context Meanings", status: "In Progress", targetQuestions: 50, completedQuestions: 30, weightageRank: "High" },
+      { id: "va-top-3", name: "Sentence Correction & Subject-Verb Agreement", status: "Completed", targetQuestions: 40, completedQuestions: 40, weightageRank: "High" },
+      { id: "va-top-4", name: "Para Jumbles & Sentence Sequence Shuffling", status: "Not Started", targetQuestions: 45, completedQuestions: 0, weightageRank: "High" },
+      { id: "va-top-5", name: "Cloze Test & Contextual Fillers", status: "Not Started", targetQuestions: 40, completedQuestions: 0, weightageRank: "Medium" }
+    ]
+  }
+];
+

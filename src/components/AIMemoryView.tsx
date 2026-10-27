@@ -13,17 +13,19 @@ import {
   Plus
 } from 'lucide-react';
 import { AIMemoryItem } from '../types';
-import { sampleAIMemories } from '../data/mockData';
+import { StorageService } from '../services/storage';
 
 export const AIMemoryView: React.FC = () => {
-  const [memories, setMemories] = useState<AIMemoryItem[]>(sampleAIMemories);
+  const [memories, setMemories] = useState<AIMemoryItem[]>(() => StorageService.getAIMemories());
   const [filterType, setFilterType] = useState<'all' | 'observed_fact' | 'ai_hypothesis'>('all');
   const [editingMemory, setEditingMemory] = useState<AIMemoryItem | null>(null);
   const [correctionText, setCorrectionText] = useState<string>('');
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
 
   const handleDelete = (id: string) => {
-    setMemories(prev => prev.filter(m => m.id !== id));
+    const updated = memories.filter(m => m.id !== id);
+    setMemories(updated);
+    StorageService.saveAIMemories(updated);
   };
 
   const handleStartEdit = (mem: AIMemoryItem) => {
@@ -33,7 +35,7 @@ export const AIMemoryView: React.FC = () => {
 
   const handleSaveCorrection = () => {
     if (!editingMemory) return;
-    setMemories(prev => prev.map(m => {
+    const updated = memories.map(m => {
       if (m.id === editingMemory.id) {
         return {
           ...m,
@@ -43,12 +45,15 @@ export const AIMemoryView: React.FC = () => {
         };
       }
       return m;
-    }));
+    });
+    setMemories(updated);
+    StorageService.saveAIMemories(updated);
     setEditingMemory(null);
   };
 
   const handleResetHistory = () => {
     setMemories([]);
+    StorageService.saveAIMemories([]);
     setShowResetConfirm(false);
   };
 
@@ -62,14 +67,10 @@ export const AIMemoryView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-terracotta-600 mb-1">
-            <BrainCircuit className="w-3.5 h-3.5" />
-            <span>Open Cognitive Ledger</span>
-          </div>
           <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
             AI Memory Transparency Center
           </h1>
-          <p className="text-sm text-ink-700/90 mt-1">
+          <p className="text-sm text-ink-700 mt-1">
             Review, audit, correct, or delete what your Study Companion has recorded about your study patterns.
           </p>
         </div>

@@ -19,6 +19,9 @@ import {
 import { LibraryDocument } from '../types';
 import { sampleLibraryDocuments } from '../data/mockData';
 
+import { StorageService } from '../services/storage';
+import { DocumentIndexer } from '../services/documentIndexer';
+
 interface StudyLibraryProps {
   onStartDocumentPractice: (docId: string) => void;
   onOpenCompanion: (prompt: string) => void;
@@ -28,65 +31,44 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({
   onStartDocumentPractice,
   onOpenCompanion
 }) => {
-  const [documents, setDocuments] = useState<LibraryDocument[]>(sampleLibraryDocuments);
-  const [selectedDoc, setSelectedDoc] = useState<LibraryDocument | null>(sampleLibraryDocuments[0]);
+  const [documents, setDocuments] = useState<LibraryDocument[]>(() => StorageService.getDocuments());
+  const [selectedDoc, setSelectedDoc] = useState<LibraryDocument | null>(() => {
+    const list = StorageService.getDocuments();
+    return list.length > 0 ? list[0] : null;
+  });
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [activeStepText, setActiveStepText] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Simulated genuine document-processing pipeline
-  const simulateUpload = (fileName: string, fileType: 'PDF' | 'DOCX') => {
+  // Genuine document-processing pipeline reading actual uploaded file
+  const handleFileUpload = async (file: File) => {
     setIsUploading(true);
-    setUploadProgress(10);
-    setActiveStepText("1/5: Uploading securely to private vault...");
+    setUploadProgress(15);
+    setActiveStepText(`1/4: Reading ${file.name} via client stream...`);
 
-    setTimeout(() => {
-      setUploadProgress(35);
-      setActiveStepText("2/5: Validating structure & OCR text extraction...");
-    }, 600);
+    try {
+      setUploadProgress(40);
+      setActiveStepText("2/4: Parsing selectable text & calculating page bounds...");
 
-    setTimeout(() => {
-      setUploadProgress(65);
-      setActiveStepText("3/5: Splitting into semantic overlapping chunks with page maps...");
-    }, 1200);
+      const doc = await DocumentIndexer.processUploadedFile(file);
 
-    setTimeout(() => {
-      setUploadProgress(85);
-      setActiveStepText("4/5: Generating embeddings & detecting candidate CET MCQs...");
-    }, 1800);
+      setUploadProgress(75);
+      setActiveStepText("3/4: Chunking text & extracting formula definitions...");
 
-    setTimeout(() => {
-      setUploadProgress(100);
-      setActiveStepText("5/5: Document indexed & ready for Socratic AI Study Companion!");
-      
-      const newDoc: LibraryDocument = {
-        id: `doc-${Date.now()}`,
-        title: fileName.replace(/\.[^/.]+$/, ""),
-        fileName,
-        fileType,
-        sizeFormatted: "3.2 MB",
-        uploadDate: "Just now",
-        status: "Ready",
-        totalPages: 24,
-        topicsDetected: ["Circular Arrangement", "Analytical Reasoning", "Shortcuts"],
-        extractedMCQsCount: 18,
-        chunksCount: 64,
-        summary: "Extracted notes detailing analytical shortcuts and practice puzzle templates.",
-        sampleChunks: [
-          {
-            pageNumber: 1,
-            chunkId: `chk-${Date.now()}-1`,
-            text: "Module 1: Linear parallel rows with alternating variables. Always fix the row with definite north-facing references first.",
-            keyFormulas: ["Row symmetry parity constraint"]
-          }
-        ]
-      };
-
-      setDocuments(prev => [newDoc, ...prev]);
-      setSelectedDoc(newDoc);
+      setTimeout(() => {
+        setUploadProgress(100);
+        setActiveStepText("4/4: Complete! Added to persistent library index.");
+        
+        const updatedList = StorageService.getDocuments();
+        setDocuments(updatedList);
+        setSelectedDoc(doc);
+        setIsUploading(false);
+      }, 500);
+    } catch {
+      setActiveStepText("Error processing file. Please ensure it is a valid text/PDF document.");
       setIsUploading(false);
-    }, 2400);
+    }
   };
 
   const filteredDocs = documents.filter(d => 
@@ -99,14 +81,10 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-terracotta-600 mb-1">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Curated Study Vault</span>
-          </div>
           <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
             My Study Library
           </h1>
-          <p className="text-sm text-ink-700/90 mt-1">
+          <p className="text-sm text-ink-700 mt-1">
             Your private books, handouts, and notes. Grounded with verified page numbers and zero fabricated citations.
           </p>
         </div>
@@ -118,12 +96,10 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({
           <input 
             type="file" 
             className="hidden" 
-            accept=".pdf,.docx,.pptx,.txt"
+            accept=".pdf,.docx,.pptx,.txt,.csv,.md"
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
-                const file = e.target.files[0];
-                const type = file.name.endsWith('.docx') ? 'DOCX' : 'PDF';
-                simulateUpload(file.name, type);
+                handleFileUpload(e.target.files[0]);
               }
             }}
           />

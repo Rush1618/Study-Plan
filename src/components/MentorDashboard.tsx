@@ -14,6 +14,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { TopicMastery, MistakeRecord, UserProfile } from '../types';
+import { StorageService } from '../services/storage';
 
 interface MentorDashboardProps {
   profile: UserProfile;
@@ -33,37 +34,68 @@ export const MentorDashboard: React.FC<MentorDashboardProps> = ({
   const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
 
   const handleAssignTask = () => {
-    setAssignmentNotice(`Assigned: ${targetQuestions} practice MCQs in "${assignedTopic}" sent to ${profile.name}'s daily itinerary!`);
-    setTimeout(() => setAssignmentNotice(null), 4000);
+    // Add assigned task to current week roadmap
+    const currentRoadmap = StorageService.getRoadmap();
+    const updated = currentRoadmap.map(week => {
+      if (week.isCurrentWeek || week.weekNumber === 1) {
+        return {
+          ...week,
+          mentorNotes: `Assigned: ${targetQuestions} MCQs in ${assignedTopic}. Priority focus requested by Prof. Sharma.`,
+          focusTopics: [
+            ...week.focusTopics,
+            {
+              subject: 'Quantitative Aptitude' as const,
+              topic: assignedTopic,
+              targetQuestions: targetQuestions,
+              completed: false
+            }
+          ]
+        };
+      }
+      return week;
+    });
+    StorageService.saveRoadmap(updated);
+
+    setAssignmentNotice(`Assigned: ${targetQuestions} practice MCQs in "${assignedTopic}" sent to ${profile.name}'s daily itinerary & roadmap!`);
+    setTimeout(() => setAssignmentNotice(null), 4500);
   };
 
   const exportSummaryReport = () => {
+    const subjects = ['Logical Reasoning', 'Abstract Reasoning', 'Quantitative Aptitude', 'Verbal Ability'] as const;
+    const sectionalLines = subjects.map(subj => {
+      const items = topicMasteries.filter(t => t.subject === subj);
+      const avgAcc = items.length ? Math.round(items.reduce((acc, i) => acc + i.accuracyPercent, 0) / items.length) : 0;
+      const avgTime = items.length ? Math.round(items.reduce((acc, i) => acc + i.averageTimePerQSeconds, 0) / items.length) : 60;
+      const status = avgAcc >= 80 ? 'Mastered' : avgAcc >= 60 ? 'Practicing' : 'Priority Revision';
+      return `- ${subj}: ${avgAcc}% (Speed: ${avgTime}s/Q) - ${status}`;
+    }).join('\n');
+
+    const topErrors = mistakes.slice(0, 5).map(m => 
+      `- ${m.mistakeCategory} in ${m.topic} (${m.repeatedCount} occurrences)`
+    ).join('\n') || '- No critical recurring errors detected yet.';
+
     const reportData = `
 HER STUDY SPACE - MENTOR DIAGNOSTIC AUDIT
 Student: ${profile.name}
-Target: ${profile.targetExam} (Exam Date Provisional)
-Start Date: ${profile.startDate} | Target: ${profile.targetEndDate}
-Export Date: 28 October 2026
+Target: ${profile.targetExam} (Exam Date Status: ${profile.examDateStatus})
+Start Date: ${profile.startDate} | Target Deadline: ${profile.targetEndDate}
+Export Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
 
 1. Sectional Mastery:
-- Abstract Reasoning: 88% (Speed: 34s/Q) - Mastered
-- Verbal Ability: 70% (Speed: 52s/Q) - Practicing
-- Logical Reasoning: 64% (Speed: 110s/Q) - Practicing
-- Quantitative Aptitude: 42% (Speed: 68s/Q) - Priority Revision
+${sectionalLines}
 
 2. Top Recurring Errors:
-- Wrong Base Value in Percentage Change (3 occurrences)
-- Circular Puzzle Direction Ambiguity (2 occurrences)
+${topErrors}
 
-3. Recommendation Rationale:
-Base value shifts prioritized due to consecutive errors on base inversion formula.
+3. Mentor Guidance:
+Supervision assigned to Prof. V. Sharma. Weekly calibration adjusts daily question difficulty based on base value and orientation inversion error trends.
     `.trim();
 
     const blob = new Blob([reportData], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${profile.name}_MAH_CET_Audit_28Oct2026.txt`;
+    a.download = `${profile.name}_MAH_CET_Audit_${new Date().toISOString().slice(0,10)}.txt`;
     a.click();
   };
 

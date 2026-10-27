@@ -22,6 +22,7 @@ import {
 import confetti from 'canvas-confetti';
 import { Question, PracticeMode, MistakeRecord, UserProfile, SubjectType } from '../types';
 import { sampleQuestions, sampleMistakes } from '../data/mockData';
+import { LearningEngine } from '../services/learningEngine';
 
 interface McqEngineProps {
   profile: UserProfile;
@@ -132,6 +133,16 @@ export const McqEngine: React.FC<McqEngineProps> = ({
   const handleFinishTest = () => {
     setIsTestFinished(true);
     setIsTestRunning(false);
+
+    // Feed each attempt directly into the persistent LearningEngine
+    activeQuestions.forEach(q => {
+      const choice = answers[q.id];
+      if (choice) {
+        const timeEstimate = Math.max(15, Math.round(elapsedSeconds / activeQuestions.length));
+        LearningEngine.processAttempt(q, choice, timeEstimate);
+      }
+    });
+
     // Trigger celebration if score is decent
     const score = calculateScore();
     if (score.percentage >= 60) {

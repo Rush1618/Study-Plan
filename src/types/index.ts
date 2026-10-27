@@ -158,3 +158,75 @@ export interface UserProfile {
   companionName: string;
   role: 'student' | 'mentor';
 }
+
+export interface FocusSession {
+  id: string;
+  subject: SubjectType;
+  topic: string;
+  targetMinutes: number;
+  actualMinutesSpent: number;
+  completed: boolean;
+  notes: string;
+  startedAt: string;
+  finishedAt?: string;
+  mcqsAttemptedCount: number;
+  accuracyPercent?: number;
+}
+
+export interface ConceptLesson {
+  id: string;
+  subject: SubjectType;
+  topic: string;
+  title: string;
+  durationMinutes: number;
+  corePrinciple: string;
+  keyFormulas: string[];
+  hinglishIntuition: string;
+  workedExamples: {
+    problemStatement: string;
+    stepByStepResolution: string[];
+    groundedRule: string;
+  }[];
+  checkpointQuestionIds: string[];
+}
+
+export interface SupabaseSyncConfig {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  syncEnabled: boolean;
+  lastSyncedTimestamp?: string;
+  syncStatus: 'idle' | 'syncing' | 'connected' | 'error';
+  errorMessage?: string;
+}
+
+export interface DailyPlanTask {
+  id: string;
+  title: string;
+  subject: SubjectType;
+  topic: string;
+  estimatedMinutes: number;
+  completed: boolean;
+  assignedByMentor: boolean;
+  mentorNote?: string;
+  taskType: 'practice' | 'concept' | 'revision';
+}
+
+export interface SyllabusTopic {
+  id: string;
+  name: string;
+  status: 'Not Started' | 'In Progress' | 'Completed';
+  targetQuestions: number;
+  completedQuestions: number;
+  weightageRank: 'High' | 'Medium' | 'Foundational';
+  keyNotes?: string;
+}
+
+export interface SyllabusSection {
+  subject: SubjectType;
+  totalQuestions: number;
+  totalMarks: number;
+  recommendedMinutes: number;
+  topics: SyllabusTopic[];
+}
+
+

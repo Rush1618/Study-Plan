@@ -7,30 +7,48 @@ import { MistakeNotebook } from './components/MistakeNotebook';
 import { RoadmapView } from './components/RoadmapView';
 import { AIMemoryView } from './components/AIMemoryView';
 import { MentorDashboard } from './components/MentorDashboard';
+import { FocusModeView } from './components/FocusModeView';
 import { StudyCompanionDrawer } from './components/StudyCompanionDrawer';
-import { 
-  initialUserProfile, 
-  sampleTopicMastery, 
-  sampleMistakes 
-} from './data/mockData';
-import { UserProfile, TopicMastery, MistakeRecord, PracticeMode } from './types';
+import { CloudSyncModal } from './components/CloudSyncModal';
+import { UserProfile, TopicMastery, MistakeRecord, PracticeMode, SupabaseSyncConfig } from './types';
+import { StorageService } from './services/storage';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
-  const [profile, setProfile] = useState<UserProfile>(initialUserProfile);
-  const [topicMasteries, setTopicMasteries] = useState<TopicMastery[]>(sampleTopicMastery);
-  const [mistakes, setMistakes] = useState<MistakeRecord[]>(sampleMistakes);
+  const [profile, setProfile] = useState<UserProfile>(() => StorageService.getProfile());
+  const [topicMasteries, setTopicMasteries] = useState<TopicMastery[]>(() => StorageService.getTopicMastery());
+  const [mistakes, setMistakes] = useState<MistakeRecord[]>(() => StorageService.getMistakes());
+  const [supabaseConfig, setSupabaseConfig] = useState<SupabaseSyncConfig>(() => StorageService.getSupabaseConfig());
+
+  // Refresh latest state from persistent storage when tab changes or reset occurs
+  const handleTabChange = (tab: string) => {
+    setCurrentTab(tab);
+    setTopicMasteries(StorageService.getTopicMastery());
+    setMistakes(StorageService.getMistakes());
+    setProfile(StorageService.getProfile());
+    setSupabaseConfig(StorageService.getSupabaseConfig());
+  };
+
+  const handleProfileReset = () => {
+    setProfile(StorageService.getProfile());
+    setTopicMasteries(StorageService.getTopicMastery());
+    setMistakes(StorageService.getMistakes());
+    setSupabaseConfig(StorageService.getSupabaseConfig());
+  };
 
   // Companion drawer state
   const [isCompanionOpen, setIsCompanionOpen] = useState<boolean>(false);
   const [companionInitialPrompt, setCompanionInitialPrompt] = useState<string | undefined>(undefined);
 
+  // Cloud Sync Modal state
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+
   // MCQ Engine initial launch mode
   const [mcqInitialMode, setMcqInitialMode] = useState<PracticeMode>('quick');
 
-  const handleStartPractice = (mode: string, payload?: any) => {
+  const handleStartPractice = (mode: string, _payload?: any) => {
     setMcqInitialMode(mode as PracticeMode);
-    setCurrentTab('mcq');
+    handleTabChange('mcq');
   };
 
   const handleOpenCompanionWithPrompt = (prompt?: string) => {
@@ -46,12 +64,14 @@ export const App: React.FC = () => {
       {/* Top Sanctuary Navigation */}
       <Navbar
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={handleTabChange}
         profile={profile}
         setProfile={setProfile}
         openCompanion={() => handleOpenCompanionWithPrompt()}
         isCompanionOpen={isCompanionOpen}
         unresolvedMistakesCount={unresolvedCount}
+        onOpenSyncModal={() => setIsSyncModalOpen(true)}
+        syncStatus={supabaseConfig.syncStatus}
       />
 
       {/* Main Content Area */}
@@ -63,7 +83,28 @@ export const App: React.FC = () => {
             mistakes={mistakes}
             onStartPractice={handleStartPractice}
             onOpenCompanion={handleOpenCompanionWithPrompt}
-            onNavigateToTab={setCurrentTab}
+            onNavigateToTab={handleTabChange}
+          />
+        )}
+
+        {currentTab === 'focus' && (
+          <FocusModeView
+            profile={profile}
+            onFinishSession={(minutes) => {
+              StorageService.logFocusSession({
+                id: `focus-${Date.now()}`,
+                subject: 'Quantitative Aptitude',
+                topic: 'Percentages & Base Values',
+                targetMinutes: 25,
+                actualMinutesSpent: minutes || 25,
+                completed: true,
+                notes: `Completed concept lesson & calibrated focus sprint.`,
+                startedAt: new Date().toISOString(),
+                mcqsAttemptedCount: 2
+              });
+              handleTabChange('dashboard');
+            }}
+            onOpenCompanion={handleOpenCompanionWithPrompt}
           />
         )}
 
@@ -118,6 +159,17 @@ export const App: React.FC = () => {
         mistakes={mistakes}
         initialPrompt={companionInitialPrompt}
         onStartPractice={handleStartPractice}
+      />
+
+      {/* Supabase Cloud Sync & Slate Reset Modal */}
+      <CloudSyncModal
+        isOpen={isSyncModalOpen}
+        onClose={() => {
+          setIsSyncModalOpen(false);
+          setSupabaseConfig(StorageService.getSupabaseConfig());
+        }}
+        profile={profile}
+        onProfileReset={handleProfileReset}
       />
 
       {/* Editorial Footer */}

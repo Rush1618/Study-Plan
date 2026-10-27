@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   Compass, 
   BookOpen, 
@@ -9,8 +8,8 @@ import {
   UserCheck, 
   Bot, 
   Languages,
-  ShieldCheck,
-  ChevronRight
+  Clock,
+  Cloud
 } from 'lucide-react';
 import { UserProfile } from '../types';
 
@@ -22,6 +21,8 @@ interface NavbarProps {
   openCompanion: () => void;
   isCompanionOpen: boolean;
   unresolvedMistakesCount: number;
+  onOpenSyncModal?: () => void;
+  syncStatus?: 'idle' | 'syncing' | 'connected' | 'error';
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,7 +32,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   setProfile,
   openCompanion,
   isCompanionOpen,
-  unresolvedMistakesCount
+  unresolvedMistakesCount,
+  onOpenSyncModal,
+  syncStatus = 'idle'
 }) => {
   const toggleRole = () => {
     setProfile(prev => ({
@@ -49,6 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navItems = [
     { id: 'dashboard', label: "Today's Session", icon: Compass },
+    { id: 'focus', label: "Focus Room", icon: Clock },
     { id: 'mcq', label: "MCQ Engine", icon: CheckCircle2 },
     { id: 'library', label: "Study Library", icon: BookOpen },
     { id: 'mistakes', label: "Mistake Notebook", icon: AlertCircle, badge: unresolvedMistakesCount },
@@ -74,7 +78,31 @@ export const Navbar: React.FC<NavbarProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-4 text-[11px]">
+        <div className="flex items-center gap-3 sm:gap-4 text-[11px]">
+          {/* Cloud Sync Status Button */}
+          {onOpenSyncModal && (
+            <button
+              onClick={onOpenSyncModal}
+              className="flex items-center gap-1.5 text-parchment-200 hover:text-white transition-colors px-2 py-0.5 rounded hover:bg-ink-800 border border-transparent hover:border-ink-700"
+              title="Supabase Cloud Synchronization Settings"
+            >
+              <Cloud className="w-3.5 h-3.5 text-terracotta-400" />
+              <span className="flex items-center gap-1">
+                <span>Cloud:</span>
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  syncStatus === 'connected' 
+                    ? 'bg-sage-400 animate-pulse' 
+                    : syncStatus === 'error'
+                    ? 'bg-rose-400'
+                    : 'bg-amber-400'
+                }`} />
+                <span className="font-medium text-white">
+                  {syncStatus === 'connected' ? 'Synced' : 'Local'}
+                </span>
+              </span>
+            </button>
+          )}
+
           {/* Language toggle */}
           <button 
             onClick={toggleLanguage}

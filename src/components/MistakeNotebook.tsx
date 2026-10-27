@@ -11,8 +11,8 @@ import {
   Sparkles,
   Play
 } from 'lucide-react';
-import { MistakeRecord, MistakeCategory } from '../types';
-import { sampleMistakes } from '../data/mockData';
+import { MistakeRecord } from '../types';
+import { StorageService } from '../services/storage';
 
 interface MistakeNotebookProps {
   onStartParallelTest: (mistakeId: string) => void;
@@ -23,19 +23,21 @@ export const MistakeNotebook: React.FC<MistakeNotebookProps> = ({
   onStartParallelTest,
   onOpenCompanion
 }) => {
-  const [mistakesList, setMistakesList] = useState<MistakeRecord[]>(sampleMistakes);
+  const [mistakesList, setMistakesList] = useState<MistakeRecord[]>(() => StorageService.getMistakes());
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeParallelId, setActiveParallelId] = useState<string | null>(null);
   const [parallelSelection, setParallelSelection] = useState<Record<string, string>>({});
   const [parallelFeedback, setParallelFeedback] = useState<Record<string, boolean>>({});
 
   const toggleResolved = (id: string) => {
-    setMistakesList(prev => prev.map(m => {
+    const updated = mistakesList.map(m => {
       if (m.id === id) {
         return { ...m, resolved: !m.resolved };
       }
       return m;
-    }));
+    });
+    setMistakesList(updated);
+    StorageService.saveMistakes(updated);
   };
 
   const handleSolveParallel = (mistakeId: string, choice: string, correct: string) => {
@@ -44,10 +46,11 @@ export const MistakeNotebook: React.FC<MistakeNotebookProps> = ({
     setParallelFeedback(prev => ({ ...prev, [mistakeId]: isRight }));
 
     if (isRight) {
-      // Mark as resolved if solved correctly!
       setTimeout(() => {
-        setMistakesList(prev => prev.map(m => m.id === mistakeId ? { ...m, resolved: true } : m));
-      }, 1000);
+        const updated = mistakesList.map(m => m.id === mistakeId ? { ...m, resolved: true } : m);
+        setMistakesList(updated);
+        StorageService.saveMistakes(updated);
+      }, 800);
     }
   };
 
@@ -72,14 +75,10 @@ export const MistakeNotebook: React.FC<MistakeNotebookProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-rose-600 mb-1">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span>Targeted Error Diagnostics</span>
-          </div>
           <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
             Mistake Notebook & Parallel Calibration
           </h1>
-          <p className="text-sm text-ink-700/90 mt-1">
+          <p className="text-sm text-ink-700 mt-1">
             We don't hide mistakes or feel shame. We classify the root misunderstanding, master the rule, and prove it with parallel questions.
           </p>
         </div>

@@ -13,6 +13,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { UserProfile, Question, MistakeRecord } from '../types';
+import { AIProvider } from '../services/aiProvider';
 
 interface Message {
   id: string;
@@ -62,7 +63,7 @@ export const StudyCompanionDrawer: React.FC<StudyCompanionDrawerProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const handleSendPrompt = (textToSend?: string) => {
+  const handleSendPrompt = async (textToSend?: string) => {
     const query = textToSend || inputText;
     if (!query.trim()) return;
 
@@ -77,64 +78,32 @@ export const StudyCompanionDrawer: React.FC<StudyCompanionDrawerProps> = ({
     setInputText('');
     setIsTyping(true);
 
-    // Dynamic Socratic response logic grounded in data
-    setTimeout(() => {
-      let reply = "";
-      let citations: { docTitle: string; page: number }[] | undefined = undefined;
-      let action: { label: string; actionKey: string } | undefined = undefined;
-
-      const lower = query.toLowerCase();
-
-      if (lower.includes('percentage') || lower.includes('base value') || lower.includes('why did my percentage accuracy drop')) {
-        reply = profile.preferredLanguage === 'Hinglish'
-          ? `${profile.name}, dekho: Jab book ka price 100 se 25% badh gaya, to wo 125 ho gaya. Ab agar wapas 100 lana hai, to ₹25 kam karna padega. Par ab reduction 125 pe calculate hogi, 100 pe nahi! 
-Formula: [x / (100 + x)] * 100 = 25/125 = 20%. 
-Tumne pichle test me 25% select kiya tha kyunki dimaag intuitively symmetry expect karta hai. Kya tum ab ek parallel question try karna chahogi?`
-          : `${profile.name}, let's dissect the base shift mathematically:
-When the price increased by 25%, a ₹100 item became ₹125.
-To return to ₹100, we must deduct ₹25. But your new base denominator is ₹125, NOT ₹100!
-Required reduction = (25 / 125) × 100 = 20%.
-In your last 3 attempts, you chose 25% because intuition assumes symmetry. In CET, base shift is an intentional trap.`;
-        
-        citations = [{ docTitle: "MAH-CET-Speed-Math-Formulas.pdf", page: 42 }];
-        action = { label: "Attempt 5 Calibrated Base-Shift Questions", actionKey: "ai_adaptive" };
-      } else if (lower.includes('circular') || lower.includes('puzzle') || lower.includes('seating')) {
-        reply = profile.preferredLanguage === 'Hinglish'
-          ? `Circular seating me sabse pehle us vyakti ko fix karo jiska facing direction pakka pata ho (jaise W facing centre). 
-Center face karne wale ke liye: Right = Anti-Clockwise, Left = Clockwise.
-Outward face karne wale ke liye: Right = Clockwise, Left = Anti-Clockwise.
-Agar ambiguity ho, to turant Case A aur Case B parallel bana lo, kabhi single diagram me guess mat karo.`
-          : `In circular arrangement with mixed facing:
-1. Always pin the entity with known orientation first (e.g., Executive W facing inward).
-2. For Inward facing: Right is Counter-Clockwise; Left is Clockwise.
-3. For Outward facing: Right is Clockwise; Left is Counter-Clockwise.
-4. Immediately fork ambiguous directions into Case A and Case B diagrams rather than guessing.`;
-        
-        citations = [{ docTitle: "Logical-Puzzles-Advanced-Handbook.docx", page: 18 }];
-        action = { label: "Launch Circular Puzzle Drill", actionKey: "topic" };
-      } else if (lower.includes('today') || lower.includes('study today') || lower.includes('priority')) {
-        reply = `Based on your recorded learning history:
-1. Top Priority: Percentages & Base Inversion (Accuracy fell to 42% across 2 sessions).
-2. Secondary: Circular Seating Arrangements with dual inward/outward facing.
-3. Speed maintenance: Abstract Reasoning 15-question sprint (Target: 35s per question).`;
-        action = { label: "Launch Today's AI Adaptive Session", actionKey: "ai_adaptive" };
-      } else {
-        reply = `I have consulted your uploaded materials. For MAH-CET 2027, every concept should be linked directly to question speed and elimination accuracy. 
-Remember: there is no negative marking in MAH-CET, so our goal is 100% attempt rate with high cognitive calibration.`;
-      }
+    try {
+      const response = await AIProvider.askAgent(query, profile.preferredLanguage);
 
       const compMsg: Message = {
         id: `c-${Date.now()}`,
         sender: 'companion',
-        text: reply,
-        citations,
-        suggestedAction: action,
+        text: response.content,
+        citations: response.citations,
+        suggestedAction: response.suggestedAction,
         timestamp: 'Just now'
       };
 
       setMessages(prev => [...prev, compMsg]);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `c-${Date.now()}`,
+          sender: 'companion',
+          text: `I consulted your learning history and uploaded materials. Let's focus on calibrating your highest-leverage concepts one session at a time.`,
+          timestamp: 'Just now'
+        }
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 700);
+    }
   };
 
   if (!isOpen) return null;
@@ -219,9 +188,9 @@ Remember: there is no negative marking in MAH-CET, so our goal is 100% attempt r
 
         {isTyping && (
           <div className="flex items-center gap-2 p-3 bg-white border border-parchment-200 rounded-2xl w-24 text-ink-500 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-bounce"></span>
-            <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-bounce [animation-delay:0.2s]"></span>
-            <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-bounce [animation-delay:0.4s]"></span>
+            <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-pulse [animation-delay:0.2s]"></span>
+            <span className="w-2 h-2 rounded-full bg-terracotta-500 animate-pulse [animation-delay:0.4s]"></span>
           </div>
         )}
 

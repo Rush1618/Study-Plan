@@ -11,8 +11,8 @@ import {
   BookOpen,
   UserCheck
 } from 'lucide-react';
+import { StorageService } from '../services/storage';
 import { RoadmapWeek, UserProfile } from '../types';
-import { sampleRoadmapWeeks } from '../data/mockData';
 
 interface RoadmapViewProps {
   profile: UserProfile;
@@ -23,7 +23,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
   profile,
   onOpenCompanion
 }) => {
-  const [weeks, setWeeks] = useState<RoadmapWeek[]>(sampleRoadmapWeeks);
+  const [weeks, setWeeks] = useState<RoadmapWeek[]>(() => StorageService.getRoadmap());
   const [selectedWeekNumber, setSelectedWeekNumber] = useState<number>(1);
   const [isEditingNotes, setIsEditingNotes] = useState<boolean>(false);
   const [mentorNoteDraft, setMentorNoteDraft] = useState<string>('');
@@ -31,23 +31,34 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
   const selectedWeek = weeks.find(w => w.weekNumber === selectedWeekNumber) || weeks[0];
 
   const toggleTopicCompleted = (topicIndex: number) => {
-    setWeeks(prev => prev.map(w => {
-      if (w.weekNumber === selectedWeekNumber) {
-        const updated = [...w.focusTopics];
-        updated[topicIndex].completed = !updated[topicIndex].completed;
-        return { ...w, focusTopics: updated };
-      }
-      return w;
-    }));
+    setWeeks(prev => {
+      const nextWeeks = prev.map(w => {
+        if (w.weekNumber === selectedWeekNumber) {
+          const updated = [...w.focusTopics];
+          updated[topicIndex] = {
+            ...updated[topicIndex],
+            completed: !updated[topicIndex].completed
+          };
+          return { ...w, focusTopics: updated };
+        }
+        return w;
+      });
+      StorageService.saveRoadmap(nextWeeks);
+      return nextWeeks;
+    });
   };
 
   const handleSaveMentorNotes = () => {
-    setWeeks(prev => prev.map(w => {
-      if (w.weekNumber === selectedWeekNumber) {
-        return { ...w, mentorNotes: mentorNoteDraft };
-      }
-      return w;
-    }));
+    setWeeks(prev => {
+      const nextWeeks = prev.map(w => {
+        if (w.weekNumber === selectedWeekNumber) {
+          return { ...w, mentorNotes: mentorNoteDraft };
+        }
+        return w;
+      });
+      StorageService.saveRoadmap(nextWeeks);
+      return nextWeeks;
+    });
     setIsEditingNotes(false);
   };
 
