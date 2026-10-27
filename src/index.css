@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-parchment: #FDFBF7;
+    --ink-primary: #142823;
+    --terracotta: #C85A32;
+  }
+
+  body {
+    background-color: #FDFBF7;
+    color: #142823;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, .font-editorial {
+    font-family: 'Fraunces', 'Newsreader', Georgia, serif;
+  }
+}
+
+/* Custom subtle scrollbars fitting the paper sanctuary */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EFE6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D2C8B4;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B6AA93;
+}
+
+/* Editorial badge styling */
+.editorial-badge {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
