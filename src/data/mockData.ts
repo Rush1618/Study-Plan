@@ -8,6 +8,8 @@ import {
   UserProfile 
 } from '../types';
 import { extractedVocabQuestions } from './extractedVocabQuestions';
+import { extractedGrammarQuestions } from './extractedGrammarQuestions';
+import { extractedVarcQuestions } from './extractedVarcQuestions';
 
 export const initialUserProfile: UserProfile = {
   name: "Sanskriti",
@@ -18,12 +20,14 @@ export const initialUserProfile: UserProfile = {
   totalWeeks: 24,
   dailyGoalHours: 3.5,
   preferredLanguage: "English",
-  companionName: "J.A.R.V.I.S.",
+  companionName: "Ruvi",
   role: "student"
 };
 
 export const sampleQuestions: Question[] = [
   ...extractedVocabQuestions,
+  ...extractedGrammarQuestions,
+  ...extractedVarcQuestions,
   {
     id: "q-cet-qa-01",
     subject: "Quantitative Aptitude",
@@ -194,11 +198,41 @@ export const sampleMistakes: MistakeRecord[] = [
     correctAnswer: "B",
     misunderstandingIdentified: "Selected 25% because of assuming symmetry (believed decrease percentage equals original increase percentage).",
     correctReasoningFormula: "When original increases by x%, base value shifts upward. Required decrease = [x / (100 + x)] × 100. For 25%, formula gives 25/125 = 20%.",
+    examinerTrapAnalysis: "Examiners always place the forward increase percentage (25%) as option (A) to trap students who solve within 10 seconds without recognizing denominator change.",
+    preventiveHabit: "Write down the new base first: Target % = (Change / NEW_BASE) × 100 before picking any option.",
+    hinglishTip: "Base value shift bhool gaye! Naya base denominator me rakhna hai (100 -> 125, so 25/125 = 20%).",
     repeatedCount: 3,
     firstFailedDate: "2026-10-24",
     lastTestedDate: "2026-10-27",
     resolved: false,
-    parallelQuestion: sampleQuestions[1]
+    parallelQuestion: sampleQuestions[1],
+    parallelQuestionsList: [
+      sampleQuestions[1],
+      {
+        id: "par-demo-02",
+        subject: "Quantitative Aptitude",
+        topic: "Percentages & Ratios",
+        subtopic: "Successive Percentage",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #2] The fuel price jumped by 20%. By what percentage should a driver reduce consumption to keep monthly expenditure constant?",
+        options: { A: "20%", B: "16.67%", C: "25%", D: "15%", E: "18%" },
+        correctAnswer: "B",
+        explanation: "Price 100 -> 120. Reduction needed is 20 on new base 120. (20/120) × 100 = 16.67%.",
+        hinglishExplanation: "Fuel price 100 se 120 hua. Kharacha wahi rakhna hai to 20 kam karna padega 120 ke upar. 20/120 = 1/6 = 16.67%."
+      },
+      {
+        id: "par-demo-03",
+        subject: "Quantitative Aptitude",
+        topic: "Percentages & Ratios",
+        subtopic: "Base Shift",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #3] If the tuition fee of an academy increases by 50%, by what percentage must it be discounted later to restore the initial fee?",
+        options: { A: "50%", B: "40%", C: "33.33%", D: "25%", E: "30%" },
+        correctAnswer: "C",
+        explanation: "100 becomes 150. Reduction needed is 50 on new base 150. (50/150) × 100 = 33.33%.",
+        hinglishExplanation: "100 se 150 ho gaya. 50 kam karna hai naye base 150 pe. 50/150 = 1/3 = 33.33%."
+      }
+    ]
   },
   {
     id: "mst-02",
@@ -212,10 +246,51 @@ export const sampleMistakes: MistakeRecord[] = [
     correctAnswer: "D",
     misunderstandingIdentified: "Counted right-hand direction assuming outward facing instead of verified inward facing for executive W.",
     correctReasoningFormula: "Inward facing: Right is Anti-Clockwise, Left is Clockwise. Outward facing: Right is Clockwise, Left is Anti-Clockwise. Draw direction arrows on every node.",
+    examinerTrapAnalysis: "CET setters alternate 'facing centre' and 'facing away' mid-statement to induce mirror confusion under high time pressure.",
+    preventiveHabit: "Mentally sit in the chair of the person. Put your pencil along their line of sight to physically orient left vs right.",
+    hinglishTip: "Facing centre me Right = Anti-Clockwise hota hai. Ek arrow draw kar ke confirm kar lo.",
     repeatedCount: 2,
     firstFailedDate: "2026-10-22",
     lastTestedDate: "2026-10-26",
-    resolved: false
+    resolved: false,
+    parallelQuestionsList: [
+      {
+        id: "par-lr-01",
+        subject: "Logical Reasoning",
+        topic: "Circular Arrangement",
+        subtopic: "Facing Inward",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #1] Six friends are seated in a circle facing the centre. If Priya is to the immediate right of Rohit, in which rotational direction from Rohit is Priya positioned?",
+        options: { A: "Clockwise", B: "Anti-Clockwise", C: "Directly Opposite", D: "Cannot be determined", E: "Diagonally right" },
+        correctAnswer: "B",
+        explanation: "For anyone facing the centre of a circle, 'Right' corresponds to the Anti-Clockwise direction.",
+        hinglishExplanation: "Centre ki taraf face karne par right humesha Anti-Clockwise (ghadi ki ulti disha) hota hai."
+      },
+      {
+        id: "par-lr-02",
+        subject: "Logical Reasoning",
+        topic: "Circular Arrangement",
+        subtopic: "Facing Outward",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #2] Eight people sit around a circular table facing AWAY from the centre. Which rotational direction corresponds to moving to someone's LEFT?",
+        options: { A: "Clockwise", B: "Anti-Clockwise", C: "Straight Ahead", D: "Random", E: "None of these" },
+        correctAnswer: "B",
+        explanation: "When facing outwards, moving to the person's left corresponds to the Anti-Clockwise direction (and right corresponds to Clockwise).",
+        hinglishExplanation: "Bahar face karne par Clockwise right hota hai, aur Anti-Clockwise left hota hai."
+      },
+      {
+        id: "par-lr-03",
+        subject: "Logical Reasoning",
+        topic: "Circular Arrangement",
+        subtopic: "Mixed Seating",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #3] In a circle of 8 people, A faces inward and B faces outward. A and B are adjacent. If you move from A towards B, you are moving clockwise. What is B relative to A?",
+        options: { A: "Immediate Right of A", B: "Immediate Left of A", C: "Third to Right", D: "Opposite", E: "Second to Left" },
+        correctAnswer: "B",
+        explanation: "Since A faces inward, Clockwise is Left. Therefore moving clockwise from A towards adjacent B means B is to the immediate Left of A.",
+        hinglishExplanation: "A centre face kar raha hai, to Clockwise uska LEFT hai. Isliye B A ke immediate left par hai."
+      }
+    ]
   },
   {
     id: "mst-03",
@@ -229,10 +304,69 @@ export const sampleMistakes: MistakeRecord[] = [
     correctAnswer: "B",
     misunderstandingIdentified: "Confused practical feasibility/cost benefit with core structural assumption necessary for the argument's validity.",
     correctReasoningFormula: "Apply the Negation Technique: 'If commuters do NOT use these buses, does the scheme fail?' Yes, so B is the assumption. Manufacturing cost doesn't break the emissions objective.",
+    examinerTrapAnalysis: "Examiners include attractive real-world plausible facts as distractors; an assumption is not just something true, it is an unstated premise without which the argument collapses.",
+    preventiveHabit: "Always apply the Negation Test: Negate the candidate option. If the author's conclusion falls apart, it is a valid assumption.",
+    hinglishTip: "Negation test lagao! Agar option ko ulta (NOT) karne par conclusion toot jata hai, tabhi wo assumption hai.",
     repeatedCount: 1,
     firstFailedDate: "2026-10-25",
     lastTestedDate: "2026-10-25",
-    resolved: false
+    resolved: false,
+    parallelQuestionsList: [
+      {
+        id: "par-cr-01",
+        subject: "Verbal Ability",
+        topic: "Critical Reasoning",
+        subtopic: "Assumptions",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #1] 'Company X will increase profits next quarter because they launched an online ordering portal.' What is the underlying assumption?",
+        options: {
+          A: "Company X produces the highest quality goods.",
+          B: "Consumers will actively use the online portal to place orders.",
+          C: "Competitors have no online presence.",
+          D: "Offline stores will be closed permanently.",
+          E: "Company X has zero delivery costs."
+        },
+        correctAnswer: "B",
+        explanation: "Negate B: 'Consumers will NOT use the online portal.' If so, launching it cannot increase profits. Hence B is mandatory.",
+        hinglishExplanation: "Agar consumers portal use hi nahi karenge to profit kaise badhega? Negate karne par conclusion collapse ho gaya, so (B) is the assumption."
+      },
+      {
+        id: "par-cr-02",
+        subject: "Verbal Ability",
+        topic: "Critical Reasoning",
+        subtopic: "Assumptions",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #2] 'To reduce traffic congestion, the city should introduce dedicated bicycle lanes.' What assumption is required?",
+        options: {
+          A: "Bicycles are cheaper than cars.",
+          B: "At least some commuters will switch from motorized vehicles to bicycles.",
+          C: "All citizens own a bicycle.",
+          D: "Car sales will drop to zero.",
+          E: "Weather will always remain sunny."
+        },
+        correctAnswer: "B",
+        explanation: "If no commuters switch from cars to bicycles, traffic congestion will not decrease. So B is an essential assumption.",
+        hinglishExplanation: "Agar koi bhi car chhod kar bicycle nahi lega to traffic kam nahi hoga. (B) is essential."
+      },
+      {
+        id: "par-cr-03",
+        subject: "Verbal Ability",
+        topic: "Critical Reasoning",
+        subtopic: "Inference vs Assumption",
+        difficulty: "CET Standard",
+        questionText: "[Parallel Drill #3] 'Drinking 8 glasses of water daily boosts cognitive speed in students.' Which statement, if true, most strengthens the argument?",
+        options: {
+          A: "Water is freely available in school cafeterias.",
+          B: "Dehydration is scientifically proven to reduce neural transmission speed in adolescents.",
+          C: "Students enjoy drinking juice more than water.",
+          D: "Coffee contains water as a primary ingredient.",
+          E: "8 glasses is exactly 2 litres."
+        },
+        correctAnswer: "B",
+        explanation: "Option B provides the physiological mechanism linking dehydration to reduced cognitive speed, directly strengthening the claim.",
+        hinglishExplanation: "Option B scientifically explain karta hai ki dehydration brain speed slow karta hai, isliye water speed boost karega."
+      }
+    ]
   }
 ];
 

@@ -33,7 +33,11 @@ export type MistakeCategory =
   | 'Poor Option Elimination'
   | 'Time Pressure Panic'
   | 'Conceptual Gap'
-  | 'Direction/Orientation Error';
+  | 'Direction/Orientation Error'
+  | 'Careless Speed Trap'
+  | 'Decoy / Distractor Attraction'
+  | 'Lexical & Idiom Blindspot'
+  | 'Syntax & Agreement Rule Gap';
 
 export interface MistakeRecord {
   id: string;
@@ -52,6 +56,10 @@ export interface MistakeRecord {
   lastTestedDate: string;
   resolved: boolean;
   parallelQuestion?: Question;
+  parallelQuestionsList?: Question[];
+  examinerTrapAnalysis?: string;
+  preventiveHabit?: string;
+  hinglishTip?: string;
 }
 
 export interface TopicMastery {

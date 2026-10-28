@@ -120,10 +120,10 @@ export const DailyPlanView: React.FC<DailyPlanViewProps> = ({
 
           <button
             onClick={onStartFocus}
-            className="px-3.5 py-2 rounded-xl bg-ink-900 hover:bg-ink-800 text-parchment-50 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm min-h-[40px]"
+            className="px-3.5 py-2 rounded-xl bg-ink-900 hover:bg-ink-800 text-parchment-50 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm min-h-[40px]"
           >
             <Play className="w-3.5 h-3.5 text-terracotta-300 fill-current" />
-            <span>Focus Session</span>
+            <span>Start Study Session (Quiz)</span>
           </button>
         </div>
       </div>
@@ -161,24 +161,34 @@ export const DailyPlanView: React.FC<DailyPlanViewProps> = ({
 
       {/* Note from Personal AI Companion */}
       <div className="p-4 sm:p-5 rounded-2xl bg-parchment-100/70 border border-parchment-200/80 flex items-start gap-3.5 shadow-2xs">
-        <div className="w-8 h-8 rounded-xl bg-white border border-parchment-300 flex items-center justify-center text-terracotta-600 flex-shrink-0 mt-0.5">
+        <div className="w-8 h-8 rounded-xl bg-ink-900 text-terracotta-300 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-soft">
           <Bot className="w-4 h-4 stroke-[2]" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-serif font-bold text-xs text-ink-900">
-              Personal Companion Note
+            <span className="font-serif font-bold text-xs text-ink-900 flex items-center gap-1.5">
+              <span>Ruvi Daily Briefing</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </span>
-            <button
-              onClick={() => onOpenCompanion('')}
-              className="text-xs font-semibold text-terracotta-700 hover:text-terracotta-800 transition-colors flex items-center gap-1"
-            >
-              <span>Chat with me</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onStartFocus}
+                className="text-xs font-bold text-terracotta-700 hover:text-terracotta-800 transition-colors flex items-center gap-1 bg-terracotta-50 px-2 py-1 rounded-lg border border-terracotta-200"
+              >
+                <Play className="w-2.5 h-2.5 fill-current" />
+                <span>Start Quiz Now</span>
+              </button>
+              <button
+                onClick={() => onOpenCompanion('Give me a full readiness report for today.')}
+                className="text-xs font-semibold text-ink-600 hover:text-ink-900 transition-colors flex items-center gap-1"
+              >
+                <span>Consult</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
           </div>
           <p className="text-xs text-ink-700 mt-1 leading-relaxed">
-            "Sanskriti, today let's master the base-value shift in Percentages. Remember: when an item price rises by 25%, the new base becomes 125, so the required reduction is 20%. Take one session at a time with calm breath."
+            "Hey Sanskriti! Ruvi here. Your English Chapter Pack (100 calibrated questions) is ready for today. Tap 'Start Quiz Now' to automatically open full-screen focus mode and test this chapter right away!"
           </p>
         </div>
       </div>

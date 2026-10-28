@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { DailyPlanView } from './components/DailyPlanView';
 import { McqEngine } from './components/McqEngine';
@@ -13,6 +13,7 @@ import { StudyCompanionDrawer } from './components/StudyCompanionDrawer';
 import { CloudSyncModal } from './components/CloudSyncModal';
 import { UserProfile, TopicMastery, MistakeRecord, PracticeMode, SupabaseSyncConfig } from './types';
 import { StorageService } from './services/storage';
+import { LearningEngine } from './services/learningEngine';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('daily');
@@ -20,6 +21,13 @@ export const App: React.FC = () => {
   const [topicMasteries, setTopicMasteries] = useState<TopicMastery[]>(() => StorageService.getTopicMastery());
   const [mistakes, setMistakes] = useState<MistakeRecord[]>(() => StorageService.getMistakes());
   const [supabaseConfig, setSupabaseConfig] = useState<SupabaseSyncConfig>(() => StorageService.getSupabaseConfig());
+
+  // Automatic Background Continuous Learning Runner
+  // Starts from previous checkpoint (never resets to 0), updates version automatically
+  useEffect(() => {
+    const stopRunner = LearningEngine.startAutoLearningRunner(120000);
+    return () => stopRunner();
+  }, []);
 
   // Refresh latest state from persistent storage when tab changes or reset occurs
   const handleTabChange = (tab: string) => {
@@ -48,6 +56,10 @@ export const App: React.FC = () => {
   const [mcqInitialMode, setMcqInitialMode] = useState<PracticeMode>('quick');
 
   const handleStartPractice = (mode: string, _payload?: any) => {
+    if (mode === 'focus') {
+      handleStartFocus(true);
+      return;
+    }
     setMcqInitialMode(mode as PracticeMode);
     handleTabChange('mcq');
   };
@@ -57,33 +69,54 @@ export const App: React.FC = () => {
     setIsCompanionOpen(true);
   };
 
+  const [autoStartFocus, setAutoStartFocus] = useState<boolean>(false);
+
+  const handleStartFocus = (autoFullscreen: boolean = true) => {
+    if (autoFullscreen && typeof document !== 'undefined') {
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      } catch {}
+    }
+    setAutoStartFocus(true);
+    handleTabChange('focus');
+  };
+
+  const [isFocusLocked, setIsFocusLocked] = useState<boolean>(false);
   const unresolvedCount = mistakes.filter(m => !m.resolved).length;
 
   return (
     <div className="min-h-screen flex flex-col bg-parchment-50 text-ink-900 selection:bg-terracotta-100 selection:text-terracotta-800">
       
-      {/* Top Sanctuary Navigation */}
-      <Navbar
-        currentTab={currentTab}
-        setCurrentTab={handleTabChange}
-        profile={profile}
-        setProfile={setProfile}
-        openCompanion={() => handleOpenCompanionWithPrompt()}
-        isCompanionOpen={isCompanionOpen}
-        unresolvedMistakesCount={unresolvedCount}
-        onOpenSyncModal={() => setIsSyncModalOpen(true)}
-        syncStatus={supabaseConfig.syncStatus}
-      />
+      {/* Top Sanctuary Navigation (Hidden during locked focus mode) */}
+      {!isFocusLocked && (
+        <Navbar
+          currentTab={currentTab}
+          setCurrentTab={handleTabChange}
+          profile={profile}
+          setProfile={setProfile}
+          openCompanion={() => handleOpenCompanionWithPrompt()}
+          isCompanionOpen={isCompanionOpen}
+          unresolvedMistakesCount={unresolvedCount}
+          onOpenSyncModal={() => setIsSyncModalOpen(true)}
+          syncStatus={supabaseConfig.syncStatus}
+        />
+      )}
 
-      {/* Main Content Area: pb-mobile-nav ensures bottom nav bar never covers mobile actions */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-mobile-nav lg:pb-8">
+      {/* Main Content Area */}
+      <main className={`flex-1 w-full mx-auto transition-all ${
+        isFocusLocked 
+          ? 'p-0 max-w-full' 
+          : 'max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-mobile-nav lg:pb-8'
+      }`}>
         
         {/* 1. Daily Plan & Sanctuary Focus */}
         {currentTab === 'daily' && (
           <DailyPlanView
             profile={profile}
             onStartPractice={(topic) => handleStartPractice('topic', { topic })}
-            onStartFocus={() => handleTabChange('focus')}
+            onStartFocus={() => handleStartFocus(true)}
             onOpenCompanion={(prompt) => {
               if (prompt) {
                 handleOpenCompanionWithPrompt(prompt);
@@ -141,7 +174,11 @@ export const App: React.FC = () => {
         {currentTab === 'focus' && (
           <FocusModeView
             profile={profile}
+            autoStartSession={autoStartFocus}
+            onSessionLockChange={(locked) => setIsFocusLocked(locked)}
             onFinishSession={(minutes) => {
+              setAutoStartFocus(false);
+              setIsFocusLocked(false);
               StorageService.logFocusSession({
                 id: `focus-${Date.now()}`,
                 subject: 'Quantitative Aptitude',

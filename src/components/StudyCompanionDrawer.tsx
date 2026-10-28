@@ -47,7 +47,7 @@ export const StudyCompanionDrawer: React.FC<StudyCompanionDrawerProps> = ({
     {
       id: 'm1',
       sender: 'companion',
-      text: `Hello ${profile.name}. I am your Study Companion. I have indexed your uploaded notes and recorded your last 14 practice attempts. How can I guide you today?`,
+      text: `Hey ${profile.name}! Ruvi here. I have indexed your syllabus notes and recorded your practice attempts. How can I guide you today?`,
       timestamp: 'Just now'
     }
   ]);

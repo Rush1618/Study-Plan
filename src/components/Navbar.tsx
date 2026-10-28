@@ -55,23 +55,30 @@ export const Navbar: React.FC<NavbarProps> = ({
     }));
   };
 
-  const navItems = [
+  interface NavItem {
+    id: string;
+    label: string;
+    icon: any;
+    badge?: number;
+  }
+
+  const navItems: NavItem[] = [
     { id: 'daily', label: 'Today', icon: Calendar },
-    { id: 'companion', label: 'Companion', icon: Bot },
+    { id: 'companion', label: 'Ruvi', icon: Bot },
+    { id: 'focus', label: 'Focus Mode', icon: Clock },
     { id: 'mcq', label: 'Practice', icon: CheckCircle2 },
     { id: 'mistakes', label: 'Mistakes', icon: AlertCircle, badge: unresolvedMistakesCount },
     { id: 'syllabus', label: 'Syllabus', icon: BookOpen },
     { id: 'roadmap', label: 'Roadmap', icon: Map },
-    { id: 'focus', label: 'Focus Room', icon: Clock },
-    { id: 'memory', label: 'AI Memory', icon: BrainCircuit },
+    { id: 'memory', label: 'AI Memory & Model', icon: BrainCircuit },
     ...(profile.role === 'mentor' ? [{ id: 'mentor', label: 'Mentor Review', icon: UserCheck }] : [])
   ];
 
-  const mobileTabs = [
+  const mobileTabs: NavItem[] = [
     { id: 'daily', label: 'Today', icon: Calendar },
-    { id: 'companion', label: 'Companion', icon: Bot },
+    { id: 'companion', label: 'Ruvi', icon: Bot },
+    { id: 'focus', label: 'Focus', icon: Clock },
     { id: 'mcq', label: 'Practice', icon: CheckCircle2 },
-    { id: 'mistakes', label: 'Mistakes', icon: AlertCircle, badge: unresolvedMistakesCount },
   ];
 
   const handleSelectTab = (tab: string) => {

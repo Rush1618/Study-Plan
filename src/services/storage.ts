@@ -36,7 +36,42 @@ const STORAGE_KEYS = {
   FOCUS_SESSIONS: 'hss_focus_sessions_v2',
   SUPABASE_SYNC: 'hss_supabase_sync_v2',
   DAILY_PLAN: 'hss_daily_plan_v2',
-  SYLLABUS: 'hss_syllabus_v2'
+  SYLLABUS: 'hss_syllabus_v2',
+  MODEL_CHECKPOINT: 'hss_model_checkpoint_v1'
+};
+
+export interface ModelCheckpoint {
+  version: string;
+  majorVersion: number;
+  minorVersion: number;
+  totalTrainingRuns: number;
+  cumulativeAttempts: number;
+  lastTrainedAt: string;
+  loss: number;
+  bktParameters: {
+    priorKnowledgePL0: number;
+    transitionRatePT: number;
+    slipRatePS: number;
+    guessRatePG: number;
+  };
+  topicLatentMastery: Record<string, number>;
+}
+
+export const defaultModelCheckpoint: ModelCheckpoint = {
+  version: 'v1.0',
+  majorVersion: 1,
+  minorVersion: 0,
+  totalTrainingRuns: 0,
+  cumulativeAttempts: 0,
+  lastTrainedAt: new Date().toISOString(),
+  loss: 0.693,
+  bktParameters: {
+    priorKnowledgePL0: 0.52,
+    transitionRatePT: 0.18,
+    slipRatePS: 0.10,
+    guessRatePG: 0.20
+  },
+  topicLatentMastery: {}
 };
 
 export interface AttemptLog {
@@ -68,7 +103,12 @@ export const StorageService = {
   getProfile(): UserProfile {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PROFILE);
-      return data ? JSON.parse(data) : initialUserProfile;
+      const prof: UserProfile = data ? JSON.parse(data) : initialUserProfile;
+      if (prof.companionName === 'Study Companion' || prof.companionName === 'J.A.R.V.I.S.') {
+        prof.companionName = 'Ruvi';
+        localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(prof));
+      }
+      return prof;
     } catch {
       return initialUserProfile;
     }
@@ -281,6 +321,19 @@ export const StorageService = {
     this.saveSyllabus(updated);
   },
 
+  getModelCheckpoint(): ModelCheckpoint {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.MODEL_CHECKPOINT);
+      return data ? JSON.parse(data) : defaultModelCheckpoint;
+    } catch {
+      return defaultModelCheckpoint;
+    }
+  },
+
+  saveModelCheckpoint(checkpoint: ModelCheckpoint): void {
+    localStorage.setItem(STORAGE_KEYS.MODEL_CHECKPOINT, JSON.stringify(checkpoint));
+  },
+
   exportAllData(): Record<string, any> {
     return {
       profile: this.getProfile(),
@@ -293,8 +346,46 @@ export const StorageService = {
       attemptLogs: this.getAttemptLogs(),
       focusSessions: this.getFocusSessions(),
       supabaseConfig: this.getSupabaseConfig(),
+      dailyPlan: this.getDailyPlan(),
+      syllabus: this.getSyllabus(),
+      modelCheckpoint: this.getModelCheckpoint(),
       exportedAt: new Date().toISOString()
     };
+  },
+
+  importAllData(data: Record<string, any>): boolean {
+    try {
+      if (!data || typeof data !== 'object') return false;
+      if (data.profile) localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(data.profile));
+      if (data.questions) localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(data.questions));
+      if (data.mistakes) localStorage.setItem(STORAGE_KEYS.MISTAKES, JSON.stringify(data.mistakes));
+      if (data.topicMastery) localStorage.setItem(STORAGE_KEYS.TOPIC_MASTERY, JSON.stringify(data.topicMastery));
+      if (data.documents) localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(data.documents));
+      if (data.aiMemories) localStorage.setItem(STORAGE_KEYS.AI_MEMORIES, JSON.stringify(data.aiMemories));
+      if (data.roadmap) localStorage.setItem(STORAGE_KEYS.ROADMAP, JSON.stringify(data.roadmap));
+      if (data.attemptLogs) localStorage.setItem(STORAGE_KEYS.ATTEMPT_LOGS, JSON.stringify(data.attemptLogs));
+      if (data.focusSessions) localStorage.setItem(STORAGE_KEYS.FOCUS_SESSIONS, JSON.stringify(data.focusSessions));
+      if (data.dailyPlan) localStorage.setItem(STORAGE_KEYS.DAILY_PLAN, JSON.stringify(data.dailyPlan));
+      if (data.syllabus) localStorage.setItem(STORAGE_KEYS.SYLLABUS, JSON.stringify(data.syllabus));
+      if (data.modelCheckpoint) localStorage.setItem(STORAGE_KEYS.MODEL_CHECKPOINT, JSON.stringify(data.modelCheckpoint));
+      return true;
+    } catch (e) {
+      console.error("Failed to import data:", e);
+      return false;
+    }
+  },
+
+  downloadBackup(): void {
+    const backup = this.exportAllData();
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ruvi_memory_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   },
 
   resetToFreshProfile(studentName: string = 'Sanskriti'): void {

@@ -3,7 +3,7 @@ import { Question } from '../types';
 export const extractedVocabQuestions: Question[] = [
   {
     "id": "cet-voc-001",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -24,7 +24,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-002",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -45,7 +45,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-003",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -66,7 +66,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-004",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -87,7 +87,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-005",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -108,7 +108,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-006",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -129,7 +129,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-007",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -150,7 +150,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-008",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -171,7 +171,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-009",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -192,7 +192,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-010",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "List of Words",
     "difficulty": "CET Standard",
@@ -213,7 +213,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-011",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -234,7 +234,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-012",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -255,7 +255,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-013",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -276,7 +276,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-014",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -297,7 +297,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-015",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -318,7 +318,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-016",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -339,7 +339,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-017",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -360,7 +360,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-018",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -381,7 +381,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-019",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -402,7 +402,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-020",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Words Confused & Misused",
     "difficulty": "CET Standard",
@@ -423,7 +423,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-021",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -444,7 +444,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-022",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -465,7 +465,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-023",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -486,7 +486,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-024",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -507,7 +507,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-025",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -528,7 +528,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-026",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -549,7 +549,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-027",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -570,7 +570,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-028",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -591,7 +591,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-029",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -612,7 +612,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-030",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Phobias",
     "difficulty": "CET Standard",
@@ -633,7 +633,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-031",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -654,7 +654,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-032",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -675,7 +675,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-033",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -696,7 +696,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-034",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -717,7 +717,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-035",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -738,7 +738,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-036",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -759,7 +759,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-037",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -780,7 +780,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-038",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -801,7 +801,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-039",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -822,7 +822,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-040",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Manias",
     "difficulty": "CET Standard",
@@ -843,7 +843,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-041",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -864,7 +864,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-042",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -885,7 +885,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-043",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -906,7 +906,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-044",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -927,7 +927,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-045",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -948,7 +948,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-046",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -969,7 +969,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-047",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -990,7 +990,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-048",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -1011,7 +1011,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-049",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -1032,7 +1032,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-050",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Prefixes & Suffixes",
     "difficulty": "CET Standard",
@@ -1053,7 +1053,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-051",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1074,7 +1074,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-052",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1095,7 +1095,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-053",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1116,7 +1116,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-054",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1137,7 +1137,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-055",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1158,7 +1158,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-056",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1179,7 +1179,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-057",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1200,7 +1200,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-058",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1221,7 +1221,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-059",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1242,7 +1242,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-060",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Analogies",
     "difficulty": "CET Standard",
@@ -1263,7 +1263,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-061",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1284,7 +1284,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-062",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1305,7 +1305,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-063",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1326,7 +1326,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-064",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1347,7 +1347,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-065",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1368,7 +1368,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-066",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1389,7 +1389,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-067",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1410,7 +1410,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-068",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1431,7 +1431,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-069",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1452,7 +1452,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-070",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Synonyms",
     "difficulty": "CET Standard",
@@ -1473,7 +1473,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-071",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1494,7 +1494,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-072",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1515,7 +1515,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-073",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1536,7 +1536,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-074",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1557,7 +1557,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-075",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1578,7 +1578,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-076",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1599,7 +1599,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-077",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1620,7 +1620,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-078",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1641,7 +1641,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-079",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1662,7 +1662,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-080",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Antonyms",
     "difficulty": "CET Standard",
@@ -1683,7 +1683,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-081",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1704,7 +1704,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-082",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1725,7 +1725,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-083",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1746,7 +1746,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-084",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1767,7 +1767,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-085",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1788,7 +1788,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-086",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1809,7 +1809,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-087",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1830,7 +1830,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-088",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1851,7 +1851,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-089",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1872,7 +1872,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-090",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "One Word Substitution",
     "difficulty": "CET Standard",
@@ -1893,7 +1893,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-091",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -1914,7 +1914,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-092",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -1935,7 +1935,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-093",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -1956,7 +1956,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-094",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -1977,7 +1977,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-095",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -1998,7 +1998,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-096",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -2019,7 +2019,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-097",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -2040,7 +2040,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-098",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -2061,7 +2061,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-099",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",
@@ -2082,7 +2082,7 @@ export const extractedVocabQuestions: Question[] = [
   },
   {
     "id": "cet-voc-100",
-    "subject": "Verbal Ability & Reading Comprehension",
+    "subject": "Verbal Ability",
     "topic": "Vocabulary",
     "subtopic": "Idioms / Phrases",
     "difficulty": "CET Standard",

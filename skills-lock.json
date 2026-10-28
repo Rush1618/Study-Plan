@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "quiz-and-assessment-design": {
+      "source": "rampstackco/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quiz-and-assessment-design/SKILL.md",
+      "computedHash": "d1f4aa8c1c1fe2e2b5a45486cfc46b6a7babfc9a98824150b6b2febf8973a790"
+    },
+    "quiz-maker": {
+      "source": "onewave-ai/claude-skills",
+      "sourceType": "github",
+      "skillPath": "quiz-maker/SKILL.md",
+      "computedHash": "0fb1ceecf90d4b3f4afc4cf7b1eed48a425aef2cacc40aa644e5d5c29d818838"
+    },
+    "research": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/research/SKILL.md",
+      "computedHash": "2c8b768d5f0309eaea9f92ef740101e813645b39aef88fb82733a52eae23dc0b"
+    },
+    "tutor": {
+      "source": "bevibing/tutor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/tutor/SKILL.md",
+      "computedHash": "5641294ffc6812393e7220782946ccd8fd82b12a52facc662b76905d603c40c0"
+    }
+  }
+}
