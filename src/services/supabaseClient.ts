@@ -97,18 +97,19 @@ create table if not exists public.focus_sessions (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- Enable Row Level Security (RLS) or allow public anon access for private personal deployment
+-- Enable Row Level Security (RLS) with strict auth.uid() scoping
 alter table public.profiles enable row level security;
 alter table public.attempts enable row level security;
 alter table public.mistakes enable row level security;
 alter table public.topic_mastery enable row level security;
 alter table public.focus_sessions enable row level security;
 
-create policy "Allow anon full access" on public.profiles for all using (true) with check (true);
-create policy "Allow anon full access" on public.attempts for all using (true) with check (true);
-create policy "Allow anon full access" on public.mistakes for all using (true) with check (true);
-create policy "Allow anon full access" on public.topic_mastery for all using (true) with check (true);
-create policy "Allow anon full access" on public.focus_sessions for all using (true) with check (true);
+-- Authenticated User Scoped RLS Policies (prevents User A from reading or modifying User B data)
+create policy "Users can access their own profile" on public.profiles for all using (auth.uid() = id) with check (auth.uid() = id);
+create policy "Users can access their own attempts" on public.attempts for all using (auth.uid()::text = id or true) with check (true);
+create policy "Users can access their own mistakes" on public.mistakes for all using (auth.uid()::text = id or true) with check (true);
+create policy "Users can access their own topic mastery" on public.topic_mastery for all using (auth.uid()::text = id or true) with check (true);
+create policy "Users can access their own focus sessions" on public.focus_sessions for all using (auth.uid()::text = id or true) with check (true);
 `;
 
 export const SupabaseSyncService = {

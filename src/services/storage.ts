@@ -87,10 +87,16 @@ export interface AttemptLog {
 }
 
 export interface AIProviderConfig {
-  provider: 'local_socratic' | 'gemini' | 'openai' | 'anthropic';
+  provider: 'openrouter' | 'local_socratic' | 'gemini' | 'openai' | 'anthropic';
   apiKey?: string;
   modelName?: string;
 }
+
+export const defaultAIConfig: AIProviderConfig = {
+  provider: 'local_socratic',
+  apiKey: '',
+  modelName: 'local-socratic-v1'
+};
 
 export const defaultSupabaseConfig: SupabaseSyncConfig = {
   supabaseUrl: '',
@@ -183,9 +189,18 @@ export const StorageService = {
     localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(docs));
   },
 
-  addDocument(doc: LibraryDocument): void {
+  addDocument(doc: LibraryDocument): boolean {
     const list = this.getDocuments();
+    const isDuplicate = list.some(d => 
+      d.id === doc.id || 
+      d.title.trim().toLowerCase() === doc.title.trim().toLowerCase() ||
+      (Boolean(d.fileName) && Boolean(doc.fileName) && d.fileName.trim().toLowerCase() === doc.fileName.trim().toLowerCase())
+    );
+    if (isDuplicate) {
+      return false;
+    }
     this.saveDocuments([doc, ...list]);
+    return true;
   },
 
   getAIMemories(): AIMemoryItem[] {
@@ -238,18 +253,26 @@ export const StorageService = {
     }
   },
 
+  saveFocusSessions(sessions: FocusSession[]): void {
+    localStorage.setItem(STORAGE_KEYS.FOCUS_SESSIONS, JSON.stringify(sessions));
+  },
+
   logFocusSession(session: FocusSession): void {
     const sessions = this.getFocusSessions();
     sessions.unshift(session);
-    localStorage.setItem(STORAGE_KEYS.FOCUS_SESSIONS, JSON.stringify(sessions));
+    this.saveFocusSessions(sessions);
   },
 
   getAIConfig(): AIProviderConfig {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.API_CONFIG);
-      return data ? JSON.parse(data) : { provider: 'local_socratic' };
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (parsed.apiKey) return parsed;
+      }
+      return defaultAIConfig;
     } catch {
-      return { provider: 'local_socratic' };
+      return defaultAIConfig;
     }
   },
 
@@ -334,8 +357,9 @@ export const StorageService = {
     localStorage.setItem(STORAGE_KEYS.MODEL_CHECKPOINT, JSON.stringify(checkpoint));
   },
 
-  exportAllData(): Record<string, any> {
-    return {
+  exportAllData(): string {
+    const backup = {
+      schemaVersion: '2.0.0',
       profile: this.getProfile(),
       questions: this.getQuestions(),
       mistakes: this.getMistakes(),
@@ -345,16 +369,18 @@ export const StorageService = {
       roadmap: this.getRoadmap(),
       attemptLogs: this.getAttemptLogs(),
       focusSessions: this.getFocusSessions(),
-      supabaseConfig: this.getSupabaseConfig(),
       dailyPlan: this.getDailyPlan(),
       syllabus: this.getSyllabus(),
       modelCheckpoint: this.getModelCheckpoint(),
       exportedAt: new Date().toISOString()
+      // SENSITIVE SECURITY NOTICE: API keys, tokens, and credentials are intentionally excluded
     };
+    return JSON.stringify(backup, null, 2);
   },
 
-  importAllData(data: Record<string, any>): boolean {
+  importAllData(input: string | Record<string, any>): boolean {
     try {
+      const data = typeof input === 'string' ? JSON.parse(input) : input;
       if (!data || typeof data !== 'object') return false;
       if (data.profile) localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(data.profile));
       if (data.questions) localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(data.questions));
@@ -376,12 +402,12 @@ export const StorageService = {
   },
 
   downloadBackup(): void {
-    const backup = this.exportAllData();
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const backupJson = this.exportAllData();
+    const blob = new Blob([backupJson], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ruvi_memory_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `ruvi_study_backup_${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

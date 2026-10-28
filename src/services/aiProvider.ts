@@ -33,8 +33,70 @@ export const AIProvider = {
     const mistakes = StorageService.getMistakes();
     const profile = StorageService.getProfile();
 
-    // 2. If configured with Gemini API Key
-    if (config.provider === 'gemini' && config.apiKey) {
+    // 2. OpenRouter API integration
+    if ((config.provider === 'openrouter' || config.apiKey?.startsWith('sk-or-')) && config.apiKey) {
+      try {
+        const promptContext = `
+You are Ruvi, the personal AI Study Companion and Mentor for ${profile.name}, who is preparing for MAH-MBA/MMS-CET 2027.
+Preferred explanation language: ${preferredLanguage}.
+Current Student Mastery Overview: ${JSON.stringify(mastery.map(m => ({ topic: m.topicName, accuracy: m.accuracyPercent + '%' })))}.
+Active Unresolved Mistakes: ${JSON.stringify(mistakes.filter(m => !m.resolved).map(m => ({ topic: m.topic, misunderstanding: m.misunderstandingIdentified })))}.
+Relevant Excerpts from Uploaded Notes: ${JSON.stringify(matches.map(m => ({ doc: m.docTitle, page: m.pageNumber, text: m.text })))}.
+
+MAH-CET Exam Rules:
+- 200 Questions in 150 minutes (45s per Q target).
+- Sections: Logical Reasoning (75), Quantitative Aptitude (50), Verbal Ability (50), Abstract Reasoning (25).
+- Zero negative marking!
+- Top targets: JBIMS (99.99 %ile, 142+ score), SIMSREE (99.95 %ile, 135+ score).
+
+Instructions:
+1. Explain conceptually and Socratically. Do not dump dry code or developer training jargon. Converse naturally like ChatGPT.
+2. If language is Hinglish, use intuitive everyday Hindi words with English terms (e.g. "Pehle base check karo", "Yeh examiner ka favorite trap hai").
+3. Keep tone calming, encouraging, and razor-sharp for CET speed.
+        `.trim();
+
+        const model = config.modelName || 'google/gemini-2.0-flash-001';
+
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey.trim()}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'http://localhost:5173',
+            'X-Title': 'Her Study Space MAH-CET'
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: 'system', content: promptContext },
+              { role: 'user', content: userPrompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 1000
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const text = data.choices?.[0]?.message?.content;
+          if (text) {
+            return {
+              content: text,
+              citations: matches.map(m => ({ docTitle: m.docTitle, page: m.pageNumber })),
+              providerUsed: `OpenRouter (${model})`
+            };
+          }
+        } else {
+          const errText = await response.text();
+          console.warn('OpenRouter API returned error, falling back to local socratic engine:', errText);
+        }
+      } catch (err) {
+        console.warn('OpenRouter API call failed, falling back to local socratic engine:', err);
+      }
+    }
+
+    // 2b. If configured with Gemini API Key
+    if (config.provider === 'gemini' && config.apiKey && !config.apiKey.startsWith('sk-or-')) {
       try {
         const promptContext = `
 You are Ruvi, the personal AI Study Companion and Mentor for ${profile.name}, who is preparing for MAH-MBA/MMS-CET 2027.

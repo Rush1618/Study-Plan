@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { DailyPlanView } from './components/DailyPlanView';
 import { McqEngine } from './components/McqEngine';
@@ -9,41 +10,26 @@ import { MistakeNotebook } from './components/MistakeNotebook';
 import { AIMemoryView } from './components/AIMemoryView';
 import { RoadmapView } from './components/RoadmapView';
 import { CompanionView } from './components/CompanionView';
+import { StudyLibrary } from './components/StudyLibrary';
 import { StudyCompanionDrawer } from './components/StudyCompanionDrawer';
 import { CloudSyncModal } from './components/CloudSyncModal';
-import { UserProfile, TopicMastery, MistakeRecord, PracticeMode, SupabaseSyncConfig } from './types';
+import { UserProfile, TopicMastery, MistakeRecord, PracticeMode, SupabaseSyncConfig, StudySessionLaunchPayload } from './types';
 import { StorageService } from './services/storage';
-import { LearningEngine } from './services/learningEngine';
+import { requestBrowserFullscreenSynchronous, createSessionPayload } from './services/sessionRouter';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('daily');
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [profile, setProfile] = useState<UserProfile>(() => StorageService.getProfile());
   const [topicMasteries, setTopicMasteries] = useState<TopicMastery[]>(() => StorageService.getTopicMastery());
   const [mistakes, setMistakes] = useState<MistakeRecord[]>(() => StorageService.getMistakes());
   const [supabaseConfig, setSupabaseConfig] = useState<SupabaseSyncConfig>(() => StorageService.getSupabaseConfig());
 
-  // Automatic Background Continuous Learning Runner
-  // Starts from previous checkpoint (never resets to 0), updates version automatically
-  useEffect(() => {
-    const stopRunner = LearningEngine.startAutoLearningRunner(120000);
-    return () => stopRunner();
-  }, []);
-
-  // Refresh latest state from persistent storage when tab changes or reset occurs
-  const handleTabChange = (tab: string) => {
-    setCurrentTab(tab);
-    setTopicMasteries(StorageService.getTopicMastery());
-    setMistakes(StorageService.getMistakes());
-    setProfile(StorageService.getProfile());
-    setSupabaseConfig(StorageService.getSupabaseConfig());
-  };
-
-  const handleProfileReset = () => {
-    setProfile(StorageService.getProfile());
-    setTopicMasteries(StorageService.getTopicMastery());
-    setMistakes(StorageService.getMistakes());
-    setSupabaseConfig(StorageService.getSupabaseConfig());
-  };
+  // Active study session payload for Focus Mode
+  const [activeSessionPayload, setActiveSessionPayload] = useState<StudySessionLaunchPayload | null>(null);
+  const [autoStartFocus, setAutoStartFocus] = useState<boolean>(false);
+  const [isFocusLocked, setIsFocusLocked] = useState<boolean>(false);
 
   // Companion drawer state
   const [isCompanionOpen, setIsCompanionOpen] = useState<boolean>(false);
@@ -55,13 +41,38 @@ export const App: React.FC = () => {
   // MCQ Engine initial launch mode
   const [mcqInitialMode, setMcqInitialMode] = useState<PracticeMode>('quick');
 
-  const handleStartPractice = (mode: string, _payload?: any) => {
-    if (mode === 'focus') {
-      handleStartFocus(true);
-      return;
-    }
-    setMcqInitialMode(mode as PracticeMode);
-    handleTabChange('mcq');
+  // Refresh latest state on location change
+  useEffect(() => {
+    setTopicMasteries(StorageService.getTopicMastery());
+    setMistakes(StorageService.getMistakes());
+    setProfile(StorageService.getProfile());
+    setSupabaseConfig(StorageService.getSupabaseConfig());
+  }, [location.pathname]);
+
+  // Dynamic Document Title for SEO & Accessibility
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      '/': "Today's Plan | RUVI — MAH-CET 2027",
+      '/daily': "Today's Plan | RUVI — MAH-CET 2027",
+      '/companion': "Ruvi Study Companion | MAH-CET 2027",
+      '/focus': "Focus Room & Timed Sprints | RUVI",
+      '/practice': "Practice & Question Bank | RUVI",
+      '/mcq': "Practice & Question Bank | RUVI",
+      '/mistakes': "Mistake Notebook & Error Log | RUVI",
+      '/syllabus': "Official Syllabus & Weightage | RUVI",
+      '/library': "Study Library & Chunks | RUVI",
+      '/roadmap': "24-Week Strategic Roadmap | RUVI",
+      '/memory': "AI Memory & Transparency | RUVI",
+      '/mentor': "Mentor Dashboard | RUVI"
+    };
+    document.title = titles[location.pathname] || "RUVI — MAH-MBA/MMS-CET 2027 Sanctuary";
+  }, [location.pathname]);
+
+  const handleProfileReset = () => {
+    setProfile(StorageService.getProfile());
+    setTopicMasteries(StorageService.getTopicMastery());
+    setMistakes(StorageService.getMistakes());
+    setSupabaseConfig(StorageService.getSupabaseConfig());
   };
 
   const handleOpenCompanionWithPrompt = (prompt?: string) => {
@@ -69,21 +80,31 @@ export const App: React.FC = () => {
     setIsCompanionOpen(true);
   };
 
-  const [autoStartFocus, setAutoStartFocus] = useState<boolean>(false);
-
-  const handleStartFocus = (autoFullscreen: boolean = true) => {
-    if (autoFullscreen && typeof document !== 'undefined') {
-      try {
-        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        }
-      } catch {}
+  const handleStartPractice = (mode: string, payload?: { topic?: string; subject?: string }) => {
+    if (mode === 'focus') {
+      handleStartFocus({ topicName: payload?.topic, subject: payload?.subject as any });
+      return;
     }
-    setAutoStartFocus(true);
-    handleTabChange('focus');
+    setMcqInitialMode(mode as PracticeMode);
+    if (payload?.topic) {
+      navigate(`/practice?mode=${encodeURIComponent(mode)}&topic=${encodeURIComponent(payload.topic)}&subject=${encodeURIComponent(payload.subject || '')}`);
+    } else {
+      navigate(`/practice?mode=${encodeURIComponent(mode)}`);
+    }
   };
 
-  const [isFocusLocked, setIsFocusLocked] = useState<boolean>(false);
+  const handleStartFocus = (payloadOverrides?: Partial<StudySessionLaunchPayload>) => {
+    // Request document fullscreen synchronously inside the real user click handler
+    requestBrowserFullscreenSynchronous();
+    const payload = createSessionPayload({
+      returnDestination: (location.pathname.replace('/', '') as any) || 'daily',
+      ...payloadOverrides
+    });
+    setActiveSessionPayload(payload);
+    setAutoStartFocus(true);
+    navigate('/focus');
+  };
+
   const unresolvedCount = mistakes.filter(m => !m.resolved).length;
 
   return (
@@ -92,8 +113,6 @@ export const App: React.FC = () => {
       {/* Top Sanctuary Navigation (Hidden during locked focus mode) */}
       {!isFocusLocked && (
         <Navbar
-          currentTab={currentTab}
-          setCurrentTab={handleTabChange}
           profile={profile}
           setProfile={setProfile}
           openCompanion={() => handleOpenCompanionWithPrompt()}
@@ -104,113 +123,164 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Main Content Area */}
+      {/* Main Multi-Page Routed Content Area */}
       <main className={`flex-1 w-full mx-auto transition-all ${
         isFocusLocked 
           ? 'p-0 max-w-full' 
           : 'max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-mobile-nav lg:pb-8'
       }`}>
-        
-        {/* 1. Daily Plan & Sanctuary Focus */}
-        {currentTab === 'daily' && (
-          <DailyPlanView
-            profile={profile}
-            onStartPractice={(topic) => handleStartPractice('topic', { topic })}
-            onStartFocus={() => handleStartFocus(true)}
-            onOpenCompanion={(prompt) => {
-              if (prompt) {
-                handleOpenCompanionWithPrompt(prompt);
-              } else {
-                handleTabChange('companion');
-              }
-            }}
+        <Routes>
+          {/* Default Route */}
+          <Route path="/" element={<Navigate to="/daily" replace />} />
+
+          {/* 1. Daily Plan Page */}
+          <Route 
+            path="/daily" 
+            element={
+              <DailyPlanView
+                profile={profile}
+                onStartPractice={(topic) => handleStartPractice('topic', { topic })}
+                onStartFocus={() => handleStartFocus()}
+                onOpenCompanion={(prompt) => {
+                  if (prompt) {
+                    handleOpenCompanionWithPrompt(prompt);
+                  } else {
+                    navigate('/companion');
+                  }
+                }}
+              />
+            } 
           />
-        )}
 
-        {/* 2. Personal AI Companion Sanctuary */}
-        {currentTab === 'companion' && (
-          <CompanionView
-            profile={profile}
-            mistakes={mistakes}
-            onStartPractice={handleStartPractice}
+          {/* 2. Ruvi AI Companion Page */}
+          <Route 
+            path="/companion" 
+            element={
+              <CompanionView
+                profile={profile}
+                mistakes={mistakes}
+                onStartPractice={handleStartPractice}
+              />
+            } 
           />
-        )}
 
-        {/* 3. MCQ Practice & Question Bank */}
-        {currentTab === 'mcq' && (
-          <McqEngine
-            profile={profile}
-            initialMode={mcqInitialMode}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+          {/* 3. MCQ Practice & Question Bank Page */}
+          <Route 
+            path="/practice" 
+            element={
+              <McqEngine
+                profile={profile}
+                initialMode={mcqInitialMode}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
           />
-        )}
+          <Route path="/mcq" element={<Navigate to="/practice" replace />} />
 
-        {/* 3. Mistake Notebook & Parallel Calibration (Re-homed) */}
-        {currentTab === 'mistakes' && (
-          <MistakeNotebook
-            onStartParallelTest={(_id) => handleStartPractice('mistake_redo')}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+          {/* 4. Mistake Notebook Page */}
+          <Route 
+            path="/mistakes" 
+            element={
+              <MistakeNotebook
+                onStartParallelTest={(_id) => handleStartPractice('mistake_redo')}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
           />
-        )}
 
-        {/* 4. Official Syllabus & Uploaded Materials */}
-        {currentTab === 'syllabus' && (
-          <SyllabusView
-            profile={profile}
-            onStartTopicPractice={(topic) => handleStartPractice('topic', { topic })}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+          {/* 5. Official Syllabus & Notes Page */}
+          <Route 
+            path="/syllabus" 
+            element={
+              <SyllabusView
+                profile={profile}
+                onStartTopicPractice={(topic) => handleStartPractice('topic', { topic })}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
           />
-        )}
 
-        {/* 5. 24-Week Strategic Roadmap (Re-homed) */}
-        {currentTab === 'roadmap' && (
-          <RoadmapView
-            profile={profile}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+          {/* 6. Study Library Page (Document Ingestion & Chunks) */}
+          <Route 
+            path="/library" 
+            element={
+              <StudyLibrary
+                onStartDocumentPractice={(docId) => handleStartPractice('topic', { topic: docId })}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
           />
-        )}
 
-        {/* 6. Focus Room */}
-        {currentTab === 'focus' && (
-          <FocusModeView
-            profile={profile}
-            autoStartSession={autoStartFocus}
-            onSessionLockChange={(locked) => setIsFocusLocked(locked)}
-            onFinishSession={(minutes) => {
-              setAutoStartFocus(false);
-              setIsFocusLocked(false);
-              StorageService.logFocusSession({
-                id: `focus-${Date.now()}`,
-                subject: 'Quantitative Aptitude',
-                topic: 'Percentages & Base Values',
-                targetMinutes: 25,
-                actualMinutesSpent: minutes || 25,
-                completed: true,
-                notes: `Completed calibrated focus sprint.`,
-                startedAt: new Date().toISOString(),
-                mcqsAttemptedCount: 2
-              });
-              handleTabChange('daily');
-            }}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+          {/* 7. 24-Week Strategic Roadmap Page */}
+          <Route 
+            path="/roadmap" 
+            element={
+              <RoadmapView
+                profile={profile}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
           />
-        )}
 
-        {/* 7. AI Memory Transparency Center (Re-homed) */}
-        {currentTab === 'memory' && (
-          <AIMemoryView />
-        )}
-
-        {/* 8. Mentor Dashboard */}
-        {currentTab === 'mentor' && (
-          <MentorDashboard
-            profile={profile}
-            topicMasteries={topicMasteries}
-            mistakes={mistakes}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+          {/* 8. Focus Room Page (with optional topic param) */}
+          <Route 
+            path="/focus" 
+            element={
+              <FocusModeView
+                profile={profile}
+                sessionPayload={activeSessionPayload}
+                autoStartSession={autoStartFocus}
+                onSessionLockChange={(locked) => setIsFocusLocked(locked)}
+                onFinishSession={(_minutes) => {
+                  setAutoStartFocus(false);
+                  setIsFocusLocked(false);
+                  const returnDest = activeSessionPayload?.returnDestination || 'daily';
+                  setActiveSessionPayload(null);
+                  navigate(`/${returnDest}`);
+                }}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
           />
-        )}
+          <Route 
+            path="/focus/:chapterId" 
+            element={
+              <FocusModeView
+                profile={profile}
+                sessionPayload={activeSessionPayload}
+                autoStartSession={autoStartFocus}
+                onSessionLockChange={(locked) => setIsFocusLocked(locked)}
+                onFinishSession={(_minutes) => {
+                  setAutoStartFocus(false);
+                  setIsFocusLocked(false);
+                  const returnDest = activeSessionPayload?.returnDestination || 'daily';
+                  setActiveSessionPayload(null);
+                  navigate(`/${returnDest}`);
+                }}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
+          />
 
+          {/* 9. AI Memory & Transparency Page */}
+          <Route path="/memory" element={<AIMemoryView />} />
+
+          {/* 10. Mentor Dashboard Page */}
+          <Route 
+            path="/mentor" 
+            element={
+              <MentorDashboard
+                profile={profile}
+                topicMasteries={topicMasteries}
+                mistakes={mistakes}
+                onOpenCompanion={handleOpenCompanionWithPrompt}
+              />
+            } 
+          />
+
+          {/* Fallback to Daily */}
+          <Route path="*" element={<Navigate to="/daily" replace />} />
+        </Routes>
       </main>
 
       {/* Socratic Study Companion Drawer (Mobile Bottom Sheet / Desktop Drawer) */}

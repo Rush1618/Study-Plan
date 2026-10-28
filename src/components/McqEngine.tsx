@@ -25,6 +25,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useSearchParams } from 'react-router-dom';
 import { Question, PracticeMode, MistakeRecord, UserProfile, SubjectType } from '../types';
 import { sampleQuestions, sampleMistakes } from '../data/mockData';
 import { LearningEngine } from '../services/learningEngine';
@@ -43,8 +44,13 @@ export const McqEngine: React.FC<McqEngineProps> = ({
   onRecordMistake,
   onOpenCompanion
 }) => {
+  const [searchParams] = useSearchParams();
+  const urlMode = searchParams.get('mode') as PracticeMode | null;
+  const urlTopic = searchParams.get('topic');
+  const urlSubject = searchParams.get('subject') as SubjectType | null;
+
   // Test configuration state
-  const [activeMode, setActiveMode] = useState<PracticeMode>(initialMode);
+  const [activeMode, setActiveMode] = useState<PracticeMode>(urlMode || initialMode);
   const [isTestRunning, setIsTestRunning] = useState<boolean>(false);
   const [isTestFinished, setIsTestFinished] = useState<boolean>(false);
 
@@ -186,6 +192,25 @@ export const McqEngine: React.FC<McqEngineProps> = ({
     setIsTestFinished(false);
     setIsTestRunning(true);
   };
+
+  // Launch test from URL query parameters (e.g., from Daily Plan or Syllabus)
+  useEffect(() => {
+    if (urlSubject && urlSubject !== 'All') {
+      setSelectedSubject(urlSubject);
+    }
+    if (urlTopic) {
+      const allStoredQ = StorageService.getQuestions();
+      const topicMatches = allStoredQ.filter(q => 
+        q.topic.toLowerCase().includes(urlTopic.toLowerCase()) || 
+        urlTopic.toLowerCase().includes(q.topic.toLowerCase())
+      );
+      if (topicMatches.length > 0) {
+        startTest('topic', topicMatches);
+      }
+    } else if (urlMode === 'mistake_redo') {
+      startTest('mistake_redo');
+    }
+  }, [urlTopic, urlSubject, urlMode]);
 
   const handleSelectOption = (opt: 'A' | 'B' | 'C' | 'D' | 'E') => {
     const currentQ = activeQuestions[currentIndex];

@@ -14,11 +14,12 @@ import {
   MoreHorizontal,
   X
 } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserProfile } from '../types';
 
 interface NavbarProps {
-  currentTab: string;
-  setCurrentTab: (tab: string) => void;
+  currentTab?: string;
+  setCurrentTab?: (tab: string) => void;
   profile: UserProfile;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
   openCompanion: () => void;
@@ -40,6 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   syncStatus = 'idle'
 }) => {
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleRole = () => {
     setProfile(prev => ({
@@ -57,32 +60,44 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   interface NavItem {
     id: string;
+    path: string;
     label: string;
     icon: any;
     badge?: number;
   }
 
   const navItems: NavItem[] = [
-    { id: 'daily', label: 'Today', icon: Calendar },
-    { id: 'companion', label: 'Ruvi', icon: Bot },
-    { id: 'focus', label: 'Focus Mode', icon: Clock },
-    { id: 'mcq', label: 'Practice', icon: CheckCircle2 },
-    { id: 'mistakes', label: 'Mistakes', icon: AlertCircle, badge: unresolvedMistakesCount },
-    { id: 'syllabus', label: 'Syllabus', icon: BookOpen },
-    { id: 'roadmap', label: 'Roadmap', icon: Map },
-    { id: 'memory', label: 'AI Memory & Model', icon: BrainCircuit },
-    ...(profile.role === 'mentor' ? [{ id: 'mentor', label: 'Mentor Review', icon: UserCheck }] : [])
+    { id: 'daily', path: '/daily', label: 'Today', icon: Calendar },
+    { id: 'companion', path: '/companion', label: 'Ruvi', icon: Bot },
+    { id: 'focus', path: '/focus', label: 'Focus Mode', icon: Clock },
+    { id: 'practice', path: '/practice', label: 'Practice', icon: CheckCircle2 },
+    { id: 'mistakes', path: '/mistakes', label: 'Mistakes', icon: AlertCircle, badge: unresolvedMistakesCount },
+    { id: 'syllabus', path: '/syllabus', label: 'Syllabus', icon: BookOpen },
+    { id: 'library', path: '/library', label: 'Library', icon: BookOpen },
+    { id: 'roadmap', path: '/roadmap', label: 'Roadmap', icon: Map },
+    { id: 'memory', path: '/memory', label: 'AI Memory', icon: BrainCircuit },
+    ...(profile.role === 'mentor' ? [{ id: 'mentor', path: '/mentor', label: 'Mentor Review', icon: UserCheck }] : [])
   ];
 
   const mobileTabs: NavItem[] = [
-    { id: 'daily', label: 'Today', icon: Calendar },
-    { id: 'companion', label: 'Ruvi', icon: Bot },
-    { id: 'focus', label: 'Focus', icon: Clock },
-    { id: 'mcq', label: 'Practice', icon: CheckCircle2 },
+    { id: 'daily', path: '/daily', label: 'Today', icon: Calendar },
+    { id: 'companion', path: '/companion', label: 'Ruvi', icon: Bot },
+    { id: 'focus', path: '/focus', label: 'Focus', icon: Clock },
+    { id: 'practice', path: '/practice', label: 'Practice', icon: CheckCircle2 },
   ];
 
-  const handleSelectTab = (tab: string) => {
-    setCurrentTab(tab);
+  const isCurrentActive = (item: NavItem) => {
+    if (location.pathname === item.path) return true;
+    if (item.id === 'daily' && location.pathname === '/') return true;
+    if (item.id === 'practice' && location.pathname === '/mcq') return true;
+    if (item.id === 'focus' && location.pathname.startsWith('/focus')) return true;
+    if (currentTab && currentTab === item.id) return true;
+    return false;
+  };
+
+  const handleSelectTab = (path: string, id: string) => {
+    if (setCurrentTab) setCurrentTab(id);
+    navigate(path);
     setIsMobileMoreOpen(false);
   };
 
@@ -94,8 +109,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
             
             {/* Brand Wordmark */}
-            <button 
-              onClick={() => handleSelectTab('daily')}
+            <Link 
+              to="/daily"
+              onClick={() => setIsMobileMoreOpen(false)}
               className="flex items-center gap-3 text-left group"
             >
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-parchment-200 border border-parchment-300 text-ink-900 flex items-center justify-center font-serif text-base sm:text-lg font-bold group-hover:bg-terracotta-100 group-hover:border-terracotta-300 group-hover:text-terracotta-700 transition-colors">
@@ -109,31 +125,34 @@ export const Navbar: React.FC<NavbarProps> = ({
                   MAH-MBA/MMS-CET 2027
                 </span>
               </div>
-            </button>
+            </Link>
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentTab === item.id;
+                const active = isCurrentActive(item);
                 return (
-                  <button
+                  <Link
                     key={item.id}
-                    onClick={() => handleSelectTab(item.id)}
+                    to={item.path}
+                    onClick={() => {
+                      if (setCurrentTab) setCurrentTab(item.id);
+                    }}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors relative min-h-[36px] ${
-                      isActive 
+                      active 
                         ? 'bg-parchment-200 text-ink-900 font-semibold' 
                         : 'text-ink-600 hover:text-ink-900 hover:bg-parchment-100'
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-terracotta-600' : 'text-ink-400'}`} />
+                    <Icon className={`w-3.5 h-3.5 ${active ? 'text-terracotta-600' : 'text-ink-400'}`} />
                     <span>{item.label}</span>
                     {item.badge !== undefined && item.badge > 0 && (
                       <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
                         {item.badge}
                       </span>
                     )}
-                  </button>
+                  </Link>
                 );
               })}
             </nav>
@@ -199,7 +218,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* MOBILE BOTTOM NAVIGATION BAR (Thumb Zone, comfortable touch targets, safe area) */}
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav 
         aria-label="Mobile Navigation"
         className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-parchment-50/95 backdrop-blur-lg border-t border-parchment-200 bottom-mobile-nav"
@@ -207,17 +226,21 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="grid grid-cols-5 h-14 max-w-md mx-auto items-center px-1">
           {mobileTabs.map((item) => {
             const Icon = item.icon;
-            const isActive = currentTab === item.id;
+            const active = isCurrentActive(item);
             return (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => handleSelectTab(item.id)}
+                to={item.path}
+                onClick={() => {
+                  if (setCurrentTab) setCurrentTab(item.id);
+                  setIsMobileMoreOpen(false);
+                }}
                 className={`flex flex-col items-center justify-center h-full min-h-[48px] rounded-lg transition-colors relative ${
-                  isActive ? 'text-terracotta-700 font-semibold' : 'text-ink-500 hover:text-ink-800'
+                  active ? 'text-terracotta-700 font-semibold' : 'text-ink-500 hover:text-ink-800'
                 }`}
               >
                 <div className="relative">
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-terracotta-600 stroke-[2.2]' : 'text-ink-400'}`} />
+                  <Icon className={`w-5 h-5 ${active ? 'text-terracotta-600 stroke-[2.2]' : 'text-ink-400'}`} />
                   {item.badge !== undefined && item.badge > 0 && (
                     <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
                       {item.badge}
@@ -225,10 +248,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   )}
                 </div>
                 <span className="text-[10px] mt-1 leading-none">{item.label}</span>
-                {isActive && (
+                {active && (
                   <span className="w-1 h-1 rounded-full bg-terracotta-500 mt-0.5"></span>
                 )}
-              </button>
+              </Link>
             );
           })}
 
@@ -236,7 +259,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => setIsMobileMoreOpen(true)}
             className={`flex flex-col items-center justify-center h-full min-h-[48px] rounded-lg transition-colors ${
-              ['roadmap', 'focus', 'memory', 'mentor'].includes(currentTab)
+              ['/roadmap', '/focus', '/memory', '/mentor', '/library', '/mistakes', '/syllabus'].some(p => location.pathname.startsWith(p))
                 ? 'text-terracotta-700 font-semibold'
                 : 'text-ink-500 hover:text-ink-800'
             }`}
@@ -267,10 +290,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
-              <button
-                onClick={() => handleSelectTab('syllabus')}
+              <Link
+                to="/syllabus"
+                onClick={() => handleSelectTab('/syllabus', 'syllabus')}
                 className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
-                  currentTab === 'syllabus'
+                  location.pathname === '/syllabus'
                     ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
                     : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
                 }`}
@@ -278,12 +302,41 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <BookOpen className="w-4 h-4 text-terracotta-600" />
                 <div className="text-xs font-medium">Syllabus & Notes</div>
                 <div className="text-[10px] text-ink-500">CET Weightage & Docs</div>
-              </button>
+              </Link>
 
-              <button
-                onClick={() => handleSelectTab('roadmap')}
+              <Link
+                to="/library"
+                onClick={() => handleSelectTab('/library', 'library')}
                 className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
-                  currentTab === 'roadmap'
+                  location.pathname === '/library'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-emerald-600" />
+                <div className="text-xs font-medium">Study Library</div>
+                <div className="text-[10px] text-ink-500">Upload & Inspect Material</div>
+              </Link>
+
+              <Link
+                to="/mistakes"
+                onClick={() => handleSelectTab('/mistakes', 'mistakes')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  location.pathname === '/mistakes'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <AlertCircle className="w-4 h-4 text-rose-600" />
+                <div className="text-xs font-medium">Mistake Notebook</div>
+                <div className="text-[10px] text-ink-500">{unresolvedMistakesCount} unresolved items</div>
+              </Link>
+
+              <Link
+                to="/roadmap"
+                onClick={() => handleSelectTab('/roadmap', 'roadmap')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  location.pathname === '/roadmap'
                     ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
                     : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
                 }`}
@@ -291,25 +344,27 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Map className="w-4 h-4 text-indigo-600" />
                 <div className="text-xs font-medium">24-Week Roadmap</div>
                 <div className="text-[10px] text-ink-500">Phases & Milestones</div>
-              </button>
+              </Link>
 
-              <button
-                onClick={() => handleSelectTab('focus')}
+              <Link
+                to="/focus"
+                onClick={() => handleSelectTab('/focus', 'focus')}
                 className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
-                  currentTab === 'focus'
+                  location.pathname.startsWith('/focus')
                     ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
                     : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
                 }`}
               >
                 <Clock className="w-4 h-4 text-amber-600" />
                 <div className="text-xs font-medium">Focus Room</div>
-                <div className="text-[10px] text-ink-500">Timed Sprints</div>
-              </button>
+                <div className="text-[10px] text-ink-500">Timed Sprints & Socratic</div>
+              </Link>
 
-              <button
-                onClick={() => handleSelectTab('memory')}
+              <Link
+                to="/memory"
+                onClick={() => handleSelectTab('/memory', 'memory')}
                 className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
-                  currentTab === 'memory'
+                  location.pathname === '/memory'
                     ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
                     : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
                 }`}
@@ -317,12 +372,39 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <BrainCircuit className="w-4 h-4 text-terracotta-600" />
                 <div className="text-xs font-medium">AI Memory</div>
                 <div className="text-[10px] text-ink-500">Inspect Hypotheses</div>
-              </button>
+              </Link>
 
-              <button
-                onClick={() => handleSelectTab('mentor')}
+              <Link
+                to="/mentor"
+                onClick={() => handleSelectTab('/mentor', 'mentor')}
                 className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
-                  currentTab === 'mentor'
+                  location.pathname === '/mentor'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <UserCheck className="w-4 h-4 text-sage-600" />
+                <div className="text-xs font-medium">Mentor Review</div>
+                <div className="text-[10px] text-ink-500">Progress Oversight</div>
+              </Link>
+            </div>
+
+            <div className="pt-2 border-t border-parchment-200 flex items-center justify-between text-xs text-ink-600">
+              <span className="text-[11px]">Role: <strong className="text-ink-900">{profile.role === 'student' ? 'Sanskriti' : 'Mentor'}</strong></span>
+              <button
+                onClick={toggleRole}
+                className="text-[11px] text-terracotta-600 font-semibold underline"
+              >
+                Switch Role
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
                     ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
                     : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
                 }`}

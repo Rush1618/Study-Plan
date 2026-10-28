@@ -26,7 +26,6 @@ yarn-error.log*
 *.swp
 *.swo
 *.bak
-/study_pack_extracted
 
 # macOS specific
 .DS_Store

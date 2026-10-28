@@ -25,14 +25,16 @@ import {
   AlertTriangle,
   Zap
 } from 'lucide-react';
-import { UserProfile, Question } from '../types';
+import { UserProfile, Question, StudySessionLaunchPayload } from '../types';
 import { StorageService } from '../services/storage';
 import { LearningEngine } from '../services/learningEngine';
 import { FocusAudio } from '../services/focusAudio';
 import { RuviVoice } from '../services/ruviVoice';
+import { requestBrowserFullscreenSynchronous, exitBrowserFullscreenSynchronous } from '../services/sessionRouter';
 
 interface FocusModeViewProps {
   profile: UserProfile;
+  sessionPayload?: StudySessionLaunchPayload | null;
   autoStartSession?: boolean;
   onSessionLockChange?: (isLocked: boolean) => void;
   onFinishSession: (minutesSpent: number) => void;
@@ -267,6 +269,62 @@ export const CHAPTERS: ChapterLesson[] = [
       stepByStep: 'True subject is "quality" (singular noun), not "mangoes" (object of preposition "of"). Hence singular "is" is correct.',
       trick: 'Hearing "mangoes are" sounds natural to the ear but is grammatically incorrect!'
     }
+  },
+  {
+    id: 'ch-syllogisms',
+    topic: 'Syllogisms & Deductive Logic',
+    title: 'Venn Euler Modeling & "Only a Few" Deductive Traps',
+    subject: 'Logical Reasoning',
+    weightage: '5-7 Questions in CET • Target: 30s per question',
+    summary: '"Only a few A are B" means two things simultaneously: (1) Some A are B, AND (2) Some A are NOT B. "Some not" is a definite negative deduction that test creators use to trap students.',
+    formulas: [
+      '"Only a few A are B" = "Some A are B" + "Some A are NOT B"',
+      'All A are B does NOT mean All B are A',
+      'Possibility rule: If a conclusion does not violate any basic statement in ANY valid Venn diagram, the possibility is TRUE'
+    ],
+    distractorTraps: [
+      'Assuming "Only a few" is the same as "Some". "Only a few" strictly forbids "All A can be B"!',
+      'Negative conclusion trap: Concluding negative fact when statements are entirely positive.'
+    ],
+    hinglishIntuition: '"Only a few A are B" ka matlab pakka hai ki kuch A, B ban hi nahi sakte! Isliye "All A being B is a possibility" 100% false hoga!',
+    filterKeyword: 'syllogism',
+    webGroundingSources: [
+      'MAH-CET Logical Deductions Blueprint',
+      'Venn Diagram Syllogism Traps Catalog'
+    ],
+    solvedExample: {
+      question: 'Statements: Only a few Pens are Books. All Books are Bags. Conclusion: All Pens can never be Bags.',
+      stepByStep: 'Some Pens are definitely not Books. But can all Pens be Bags? Yes, Pens can enter Bags without violating "Only a few Pens are Books". Hence conclusion is false.',
+      trick: 'Check if the restriction applies to the outer container or inner entity!'
+    }
+  },
+  {
+    id: 'ch-di-tables',
+    topic: 'Data Interpretation & Tables',
+    title: 'Ratio Calculations, Visual Approximations & Percentage Indices',
+    subject: 'Quantitative Aptitude',
+    weightage: '15-20 Questions in CET • Target: 40s per question',
+    summary: 'Never calculate full 6-digit division in CET. Round off denominators to nearest 10 or 100, use 10% and 1% mental brackets, and inspect option spread before dividing.',
+    formulas: [
+      'Ratio Comparison Trick: a/b vs c/d -> cross-multiply a×d vs b×c',
+      'Denominator Rounding: 437/892 ≈ 440/890 = 44/89 ≈ 49.4%',
+      'Percentage Growth = [(Final - Initial) / Initial] × 100'
+    ],
+    distractorTraps: [
+      'Full decimal trap: Spending 90 seconds doing exact long division when options differ by >5%.',
+      'Inverted base trap: Dividing growth by Final value instead of Initial baseline.'
+    ],
+    hinglishIntuition: 'Options ko pehle dekho! Agar options me doori hai (jaise 32%, 48%, 65%), to rough approximation se 15 second me answer aa jayega, lambi calculation mat karo!',
+    filterKeyword: 'data',
+    webGroundingSources: [
+      'MAH-CET Data Interpretation Speed Hacks',
+      'Speed DI Table Calculation Matrices'
+    ],
+    solvedExample: {
+      question: 'Production grew from 412 tonnes to 528 tonnes. What is the approximate percentage increase?',
+      stepByStep: 'Increase = 528 - 412 = 116. Baseline = 412. 116 / 412 ≈ 116 / 400 = 29% (slightly under 29%, ~28.1%).',
+      trick: '10% of 412 is 41.2. 30% is ~123. 116 is just under 30% (~28%). 10 seconds flat.'
+    }
   }
 ];
 
@@ -278,6 +336,7 @@ const PROTOCOLS: FocusProtocol[] = [
 
 export const FocusModeView: React.FC<FocusModeViewProps> = ({
   profile,
+  sessionPayload,
   autoStartSession = false,
   onSessionLockChange,
   onFinishSession,
@@ -308,19 +367,9 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
   // Ruvi Voice state
   const [isVoiceSpeaking, setIsVoiceSpeaking] = useState<boolean>(false);
 
-  // Dynamic Syllabus & Internet Induction State
-  const [isAiLearning, setIsAiLearning] = useState<boolean>(false);
-  const [aiLearningStage, setAiLearningStage] = useState<string>('');
-  const [aiLearningProgress, setAiLearningProgress] = useState<number>(0);
-  const [aiSynthesizedBadge, setAiSynthesizedBadge] = useState<string>('');
-
   // Auto Fullscreen & Lock Down Session
-  const lockEverythingAndStart = () => {
-    try {
-      if (typeof document !== 'undefined' && !document.fullscreenElement && document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-    } catch {}
+  const lockEverythingAndStart = (tab: 'quiz' | 'notes' = 'quiz') => {
+    requestBrowserFullscreenSynchronous();
 
     setIsLocked(true);
     if (onSessionLockChange) onSessionLockChange(true);
@@ -328,7 +377,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
     if (ambientSound !== 'none') {
       FocusAudio.playTrack(ambientSound as any, ambientVolume);
     }
-    setActiveTab('quiz');
+    setActiveTab(tab);
     setQStartTime(Date.now());
   };
 
@@ -338,12 +387,71 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
     if (onSessionLockChange) onSessionLockChange(false);
     FocusAudio.stopAmbient();
     RuviVoice.stopSpeaking();
-    try {
-      if (typeof document !== 'undefined' && document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
-    } catch {}
+    exitBrowserFullscreenSynchronous();
   };
+
+  // Handle keyboard Escape to safely exit focus mode without trapping
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isLocked) {
+        handleExitLockedSession();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLocked]);
+
+  // Synchronize sessionPayload
+  useEffect(() => {
+    if (sessionPayload) {
+      const targetTopic = sessionPayload.topicName.trim();
+      const matched = CHAPTERS.find(c => 
+        c.topic.toLowerCase().includes(targetTopic.toLowerCase()) ||
+        targetTopic.toLowerCase().includes(c.topic.toLowerCase()) ||
+        c.id === sessionPayload.topicId
+      );
+      if (matched) {
+        setSelectedChapter(matched);
+      } else {
+        setSelectedChapter({
+          id: sessionPayload.topicId || `ch-${Date.now()}`,
+          topic: sessionPayload.topicName,
+          title: `${sessionPayload.topicName} — Focus Study`,
+          subject: sessionPayload.subject,
+          weightage: 'Target CET Weightage',
+          summary: `Focused study and calibrated test session for ${sessionPayload.topicName}.`,
+          formulas: ['Focus on fundamental rules, base calculations, and eliminating distractors.'],
+          distractorTraps: ['Careless arithmetic or rush misreading conditions.'],
+          hinglishIntuition: `${sessionPayload.topicName} me question ki condition aur base dhyan se padho.`,
+          filterKeyword: sessionPayload.topicName.split(' ')[0].toLowerCase(),
+          webGroundingSources: ['MAH-CET Official Syllabus Baseline'],
+          solvedExample: {
+            question: `Standard diagnostic question for ${sessionPayload.topicName}.`,
+            stepByStep: 'Apply standard formula or diagram method step-by-step.',
+            trick: 'Check units and options before computing full decimals.'
+          }
+        });
+      }
+
+      const durMins = sessionPayload.plannedDurationMinutes || 25;
+      setSelectedProtocol({
+        id: `p-${durMins}`,
+        name: `${durMins}m Block`,
+        minutes: durMins,
+        badge: sessionPayload.quizMode === 'timed_exam' ? 'Timed Exam' : 'Target Drill',
+        description: `Calibrated focus block for ${sessionPayload.topicName}.`
+      });
+      setSecondsRemaining(durMins * 60);
+      setElapsedSeconds(0);
+      setIsCompleted(false);
+      setSolvedCount(0);
+      setCorrectCount(0);
+      setSelectedAnswer(null);
+      setIsAnswerSubmitted(false);
+      setCurrentQIndex(0);
+      setQStartTime(Date.now());
+    }
+  }, [sessionPayload]);
 
   // Auto start on mount if requested
   useEffect(() => {
@@ -365,13 +473,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
       (keyword === 'phobia' && (q.subtopic.toLowerCase().includes('phobia') || q.questionText.toLowerCase().includes('phobia') || q.questionText.toLowerCase().includes('mania')))
     );
 
-    if (filtered.length === 0) {
-      filtered = allQuestions.filter(q => q.subject === selectedChapter.subject);
-    }
-    if (filtered.length === 0) {
-      filtered = allQuestions;
-    }
-
+    // Strict Topic Filtering: Never silently fall back to unrelated subjects!
     setQuestions(filtered);
     setCurrentQIndex(0);
     setSelectedAnswer(null);
@@ -439,18 +541,23 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
     FocusAudio.playCompletionChime();
 
     const minutesSpent = Math.max(1, Math.round(elapsedSeconds / 60));
+    const sessionTopic = sessionPayload?.topicName || selectedChapter.topic;
+    const sessionSubject = (sessionPayload?.subject || selectedChapter.subject) as any;
+    const targetMins = sessionPayload?.plannedDurationMinutes || selectedProtocol.minutes;
+    const accuracy = solvedCount > 0 ? Math.round((correctCount / solvedCount) * 100) : 0;
     
     StorageService.logFocusSession({
-      id: `foc-${Date.now()}`,
-      subject: selectedChapter.subject as any,
-      topic: selectedChapter.topic,
-      targetMinutes: selectedProtocol.minutes,
+      id: sessionPayload?.sessionId || `foc-${Date.now()}`,
+      subject: sessionSubject,
+      topic: sessionTopic,
+      targetMinutes: targetMins,
       actualMinutesSpent: minutesSpent,
       completed: true,
-      notes: `Focus block on ${selectedChapter.topic}. Solved ${solvedCount} questions with ${correctCount} correct answers.`,
+      notes: `Focus block on ${sessionTopic}. Solved ${solvedCount} questions with ${correctCount} correct answers (${accuracy}%).`,
       startedAt: new Date(Date.now() - elapsedSeconds * 1000).toISOString(),
       finishedAt: new Date().toISOString(),
-      mcqsAttemptedCount: solvedCount
+      mcqsAttemptedCount: solvedCount,
+      accuracyPercent: accuracy
     });
 
     onFinishSession(minutesSpent);
@@ -496,25 +603,6 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
     }
   };
 
-  // Dynamic Syllabus Induction
-  const handleInductInternetAndSyllabus = () => {
-    setIsAiLearning(true);
-    setAiLearningProgress(20);
-    setAiLearningStage(`Querying MAH-CET syllabus parameters for ${selectedChapter.topic}...`);
-
-    setTimeout(() => {
-      setAiLearningProgress(60);
-      setAiLearningStage(`Extracting formulas & distractor traps from question distributions...`);
-    }, 600);
-
-    setTimeout(() => {
-      setAiLearningProgress(100);
-      setIsAiLearning(false);
-      setAiSynthesizedBadge(`Ruvi freshly inducted official MAH-CET syllabus guidelines & calibrated 10 targeted questions!`);
-      setTimeout(() => setAiSynthesizedBadge(''), 5000);
-    }, 1500);
-  };
-
   const formatTimer = (totalSecs: number) => {
     const mins = Math.floor(totalSecs / 60);
     const secs = totalSecs % 60;
@@ -526,9 +614,6 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
 
   // ==========================================
   // VIEW 1: LOCKED FULLSCREEN FOCUS MODE
-  // Focus does NOT take half the screen!
-  // Just a sleek 48px top bar with simple icon, locking everything up.
-  // 100% of the screen is dedicated to the Quiz or Notes!
   // ==========================================
   if (isLocked) {
     return (
@@ -545,7 +630,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="font-serif font-bold text-xs sm:text-sm text-white truncate">
-                  {selectedChapter.topic}
+                  {sessionPayload?.topicName || selectedChapter.topic}
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
               </div>
@@ -576,11 +661,32 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
               )}
             </button>
 
+            {/* Manual Fullscreen Toggle */}
+            <button
+              onClick={() => {
+                if (typeof document !== 'undefined') {
+                  if (document.fullscreenElement) {
+                    exitBrowserFullscreenSynchronous();
+                  } else {
+                    requestBrowserFullscreenSynchronous();
+                  }
+                }
+              }}
+              className="w-9 h-9 rounded-xl bg-ink-900 border border-ink-700 text-parchment-300 hover:text-white flex items-center justify-center transition-colors"
+              title="Toggle Fullscreen"
+            >
+              {typeof document !== 'undefined' && document.fullscreenElement ? (
+                <Minimize2 className="w-4 h-4 text-parchment-300" />
+              ) : (
+                <Maximize2 className="w-4 h-4 text-terracotta-400" />
+              )}
+            </button>
+
             {/* Emergency Exit / Unlock */}
             <button
               onClick={handleExitLockedSession}
               className="px-2.5 py-1.5 rounded-xl bg-ink-900 hover:bg-red-950/80 border border-ink-700 hover:border-red-800 text-[11px] font-semibold text-parchment-300 hover:text-red-300 flex items-center gap-1 transition-colors"
-              title="Unlock & Exit Focus Session"
+              title="Unlock & Exit Focus Session (Esc)"
             >
               <X className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Exit</span>
@@ -632,8 +738,42 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
           </div>
 
           {/* Active Quiz View: Fills screen with zero distraction */}
-          {activeTab === 'quiz' && currentQ && (
-            <div className="p-4 sm:p-7 rounded-3xl bg-white border border-parchment-200 shadow-soft space-y-4 animate-fadeIn">
+          {activeTab === 'quiz' && (
+            questions.length === 0 ? (
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-parchment-200 shadow-soft text-center space-y-4 animate-fadeIn">
+                <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div className="max-w-md mx-auto">
+                  <h3 className="font-serif text-lg font-bold text-ink-900">
+                    No Verified Questions for "{selectedChapter.topic}" Yet
+                  </h3>
+                  <p className="text-xs text-ink-600 mt-1.5 leading-relaxed font-sans">
+                    Ruvi strictly adheres to exam alignment and will never silently substitute unrelated questions. You can read the comprehensive chapter study notes, review formulas, or select another syllabus topic.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                  <button
+                    onClick={() => setActiveTab('notes')}
+                    className="min-h-[40px] px-4 py-2 rounded-xl bg-parchment-100 hover:bg-parchment-200 border border-parchment-300 text-xs font-semibold text-ink-800 transition-colors flex items-center gap-1.5"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-terracotta-600" />
+                    <span>Read Chapter Study Notes</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const verified = CHAPTERS.find(c => c.id !== selectedChapter.id && StorageService.getQuestions().some(q => q.topic.toLowerCase().includes(c.filterKeyword))) || CHAPTERS[0];
+                      setSelectedChapter(verified);
+                    }}
+                    className="min-h-[40px] px-4 py-2 rounded-xl bg-ink-900 hover:bg-ink-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+                  >
+                    <span>Switch to Verified Topic</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : currentQ && (
+              <div className="p-4 sm:p-7 rounded-3xl bg-white border border-parchment-200 shadow-soft space-y-4 animate-fadeIn">
               
               <div className="flex items-center justify-between text-xs text-ink-600 pb-2 border-b border-parchment-200">
                 <span className="font-semibold text-terracotta-700">
@@ -750,6 +890,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
               )}
 
             </div>
+            )
           )}
 
           {/* Active Study Notes View */}
@@ -859,7 +1000,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
         </div>
 
         <button
-          onClick={lockEverythingAndStart}
+          onClick={() => lockEverythingAndStart('quiz')}
           className="self-start sm:self-auto min-h-[48px] px-5 py-2.5 rounded-2xl bg-ink-900 hover:bg-ink-800 text-parchment-50 text-xs font-bold flex items-center gap-2 transition-colors shadow-soft"
         >
           <Lock className="w-4 h-4 text-terracotta-400" />
@@ -886,7 +1027,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
 
           <div className="flex gap-2 pt-2">
             <button
-              onClick={lockEverythingAndStart}
+              onClick={() => lockEverythingAndStart('quiz')}
               className="min-h-[44px] px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors"
             >
               Start Another Locked Session
@@ -963,6 +1104,113 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Interactive Study Guide & Formula Briefing for selected chapter */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-white border border-parchment-200 shadow-soft space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-parchment-200">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-terracotta-100 text-terracotta-800 uppercase tracking-wider">
+                Study Guide & Blueprint
+              </span>
+              <span className="text-[11px] text-ink-500 font-mono">
+                {selectedChapter.weightage}
+              </span>
+            </div>
+            <h2 className="font-serif text-lg sm:text-xl font-bold text-ink-900 mt-1">
+              {selectedChapter.topic}: {selectedChapter.title}
+            </h2>
+          </div>
+
+          <button
+            onClick={() => handleToggleVoiceReadout(`${selectedChapter.title}. ${selectedChapter.summary}. ${selectedChapter.hinglishIntuition}`)}
+            className="self-start sm:self-auto min-h-[38px] px-3 py-1.5 rounded-xl border border-parchment-300 hover:bg-parchment-100 text-xs font-semibold flex items-center gap-1.5 text-ink-800 transition-colors"
+          >
+            <Radio className={`w-3.5 h-3.5 text-terracotta-600 ${isVoiceSpeaking ? 'animate-pulse' : ''}`} />
+            <span>{isVoiceSpeaking ? "Stop Voice" : "Hear Ruvi Voice Summary"}</span>
+          </button>
+        </div>
+
+        <p className="text-xs sm:text-sm text-ink-800 leading-relaxed font-sans">
+          {selectedChapter.summary}
+        </p>
+
+        {/* Hinglish Intuition Anchor */}
+        <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs text-amber-950 space-y-1">
+          <div className="font-bold flex items-center gap-1.5 text-amber-900">
+            <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
+            <span>Hinglish Memory Anchor & Intuition:</span>
+          </div>
+          <p className="leading-relaxed">
+            {selectedChapter.hinglishIntuition}
+          </p>
+        </div>
+
+        {/* Core Formulas */}
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold text-ink-900 flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-terracotta-600" />
+            <span>Core Speed Formulas & Shortcuts:</span>
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {selectedChapter.formulas.map((f, i) => (
+              <div key={i} className="p-2.5 rounded-xl bg-parchment-100/90 border border-parchment-200 font-mono text-xs font-semibold text-terracotta-900 flex items-start gap-2">
+                <span className="w-4 h-4 rounded bg-terracotta-100 text-terracotta-700 flex items-center justify-center shrink-0 text-[10px]">
+                  {i + 1}
+                </span>
+                <span>{f}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CET Examiner Traps */}
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold text-red-900 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+            <span>CET Examiner Distractor Traps (Avoid in 45s):</span>
+          </span>
+          <div className="space-y-1.5">
+            {selectedChapter.distractorTraps.map((trap, i) => (
+              <div key={i} className="p-2.5 rounded-xl bg-red-50/80 border border-red-200 text-xs text-red-900 flex items-start gap-2">
+                <span className="text-red-600 font-bold">•</span>
+                <span>{trap}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Solved Worked Example */}
+        {selectedChapter.solvedExample && (
+          <div className="p-3.5 rounded-2xl bg-indigo-50/80 border border-indigo-200 text-xs text-indigo-950 space-y-1.5">
+            <div className="font-bold text-indigo-900 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              <span>CET Solved Benchmark Example:</span>
+            </div>
+            <p className="font-semibold text-ink-900">Q: {selectedChapter.solvedExample.question}</p>
+            <p className="text-ink-700"><span className="font-semibold text-indigo-900">Step-by-step:</span> {selectedChapter.solvedExample.stepByStep}</p>
+            <p className="text-indigo-800 font-mono text-[11px]"><span className="font-semibold">⚡ 30s Speed Trick:</span> {selectedChapter.solvedExample.trick}</p>
+          </div>
+        )}
+
+        {/* Dual Action Buttons */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2.5">
+          <button
+            onClick={() => lockEverythingAndStart('notes')}
+            className="w-full sm:w-auto min-h-[44px] px-4 py-2 rounded-xl bg-parchment-100 hover:bg-parchment-200 border border-parchment-300 text-ink-900 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-terracotta-600" />
+            <span>Read Study Guide in Fullscreen</span>
+          </button>
+          <button
+            onClick={() => lockEverythingAndStart('quiz')}
+            className="w-full sm:w-auto min-h-[44px] px-5 py-2 rounded-xl bg-terracotta-500 hover:bg-terracotta-600 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-soft"
+          >
+            <Zap className="w-3.5 h-3.5 fill-current" />
+            <span>Start Interactive Test Quiz ({questions.length} Questions)</span>
+          </button>
         </div>
       </div>
 
@@ -1044,7 +1292,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
         </div>
 
         <button
-          onClick={lockEverythingAndStart}
+          onClick={() => lockEverythingAndStart('quiz')}
           className="w-full sm:w-auto min-h-[50px] px-6 py-3 rounded-2xl bg-terracotta-500 hover:bg-terracotta-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-soft transition-colors shrink-0"
         >
           <Lock className="w-4 h-4 fill-current" />

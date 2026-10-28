@@ -237,4 +237,17 @@ export interface SyllabusSection {
   topics: SyllabusTopic[];
 }
 
+export interface StudySessionLaunchPayload {
+  sessionId: string;
+  taskId?: string;
+  subject: SubjectType;
+  topicId?: string;
+  topicName: string;
+  plannedDurationMinutes: number;
+  quizMode: 'practice' | 'diagnostic' | 'timed_exam' | 'mistake_drill';
+  sourceContentIds?: string[];
+  returnDestination: 'daily' | 'syllabus' | 'roadmap' | 'companion' | 'mistakes';
+  autoFullscreen?: boolean;
+}
+
 

@@ -42,7 +42,6 @@ export const DocumentIndexer = {
       }))
     };
 
-    StorageService.addDocument(doc);
     return doc;
   },
 

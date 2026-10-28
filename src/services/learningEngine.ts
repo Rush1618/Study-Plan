@@ -169,10 +169,7 @@ export const LearningEngine = {
       }
     }
 
-    // Silent automatic background learning tick (updates model version in background)
-    setTimeout(() => {
-      this.trainLearnerModel(1).catch(() => {});
-    }, 150);
+    // Observed metrics updated transactionally based on real attempt
 
     return {
       isCorrect,
@@ -493,11 +490,6 @@ export const LearningEngine = {
         status = accuracy >= 70 ? 'Mastered' : 'Practicing';
       }
 
-      tm.accuracyPercent = accuracy;
-      tm.status = status;
-      tm.averageTimePerQSeconds = speedSecs;
-      tm.evidenceText = `BKT Model calibrated (${epochs} epochs). P(L)=${masteryProb.toFixed(2)}, Optimal time=${speedSecs}s.`;
-
       return {
         topicName: tm.topicName,
         masteryProbability: Number(masteryProb.toFixed(2)),
@@ -506,8 +498,14 @@ export const LearningEngine = {
       };
     });
 
-    // Save updated topic mastery
-    StorageService.saveTopicMastery(allMasteries);
+    // Keep observed topic mastery metrics intact (never overwrite real student history with model predictions)
+    // Model estimates are returned in topicCalibrations and persisted on checkpoint
+    const topicLatentMastery: Record<string, number> = {};
+    topicCalibrations.forEach(tc => {
+      topicLatentMastery[tc.topicName] = tc.masteryProbability;
+    });
+    updatedCheckpoint.topicLatentMastery = topicLatentMastery;
+    StorageService.saveModelCheckpoint(updatedCheckpoint);
 
     // Form fresh calibrated AI Hypotheses
     const trainedHypotheses: AIMemoryItem[] = [
@@ -559,27 +557,12 @@ export const LearningEngine = {
   },
 
   /**
-   * Starts automatic periodic model calibration runner in the background.
-   * Runs silently, resumes from the saved checkpoint, and automatically bumps version.
+   * Automatic periodic model runner disabled to preserve observed accuracy integrity.
+   * Model parameters update deterministically based on real verified student attempts.
    */
-  startAutoLearningRunner(intervalMs: number = 180000): () => void {
-    if (typeof window === 'undefined') return () => {};
-
-    const checkpoint = StorageService.getModelCheckpoint();
-    console.log(`[Ruvi Auto-Learning Engine] Auto-Runner initiated. Checkpoint loaded from version ${checkpoint.version} (Total Runs: ${checkpoint.totalTrainingRuns}). Resuming continuous learning...`);
-
-    // Initial silent warm-up calibration run (1 epoch)
-    setTimeout(() => {
-      this.trainLearnerModel(1).catch(() => {});
-    }, 2000);
-
-    // Periodic silent auto-training loop
-    const timerId = window.setInterval(() => {
-      console.log(`[Ruvi Auto-Learning Engine] Periodic auto-calibration trigger running in background...`);
-      this.trainLearnerModel(2).catch(() => {});
-    }, intervalMs);
-
-    return () => clearInterval(timerId);
+  startAutoLearningRunner(_intervalMs: number = 180000): () => void {
+    console.log(`[Ruvi Learner Model] Periodic auto-runner disabled. Metric updates are deterministic upon real attempts.`);
+    return () => {};
   }
 };
 
