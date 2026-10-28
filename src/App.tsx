@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { DashboardView } from './components/DashboardView';
+import { DailyPlanView } from './components/DailyPlanView';
 import { McqEngine } from './components/McqEngine';
-import { StudyLibrary } from './components/StudyLibrary';
-import { MistakeNotebook } from './components/MistakeNotebook';
-import { RoadmapView } from './components/RoadmapView';
-import { AIMemoryView } from './components/AIMemoryView';
-import { MentorDashboard } from './components/MentorDashboard';
+import { SyllabusView } from './components/SyllabusView';
 import { FocusModeView } from './components/FocusModeView';
+import { MentorDashboard } from './components/MentorDashboard';
 import { StudyCompanionDrawer } from './components/StudyCompanionDrawer';
 import { CloudSyncModal } from './components/CloudSyncModal';
 import { UserProfile, TopicMastery, MistakeRecord, PracticeMode, SupabaseSyncConfig } from './types';
 import { StorageService } from './services/storage';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('dashboard');
+  const [currentTab, setCurrentTab] = useState<string>('daily');
   const [profile, setProfile] = useState<UserProfile>(() => StorageService.getProfile());
   const [topicMasteries, setTopicMasteries] = useState<TopicMastery[]>(() => StorageService.getTopicMastery());
   const [mistakes, setMistakes] = useState<MistakeRecord[]>(() => StorageService.getMistakes());
@@ -76,17 +73,36 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {currentTab === 'dashboard' && (
-          <DashboardView
+        
+        {/* 1. Daily Plan */}
+        {currentTab === 'daily' && (
+          <DailyPlanView
             profile={profile}
-            topicMasteries={topicMasteries}
-            mistakes={mistakes}
-            onStartPractice={handleStartPractice}
+            onStartPractice={(topic) => handleStartPractice('topic', { topic })}
+            onStartFocus={() => handleTabChange('focus')}
             onOpenCompanion={handleOpenCompanionWithPrompt}
-            onNavigateToTab={handleTabChange}
           />
         )}
 
+        {/* 2. MCQ Practice & Question Bank */}
+        {currentTab === 'mcq' && (
+          <McqEngine
+            profile={profile}
+            initialMode={mcqInitialMode}
+            onOpenCompanion={handleOpenCompanionWithPrompt}
+          />
+        )}
+
+        {/* 3. Official Syllabus & Uploaded Materials */}
+        {currentTab === 'syllabus' && (
+          <SyllabusView
+            profile={profile}
+            onStartTopicPractice={(topic) => handleStartPractice('topic', { topic })}
+            onOpenCompanion={handleOpenCompanionWithPrompt}
+          />
+        )}
+
+        {/* 4. Focus Room */}
         {currentTab === 'focus' && (
           <FocusModeView
             profile={profile}
@@ -98,49 +114,17 @@ export const App: React.FC = () => {
                 targetMinutes: 25,
                 actualMinutesSpent: minutes || 25,
                 completed: true,
-                notes: `Completed concept lesson & calibrated focus sprint.`,
+                notes: `Completed calibrated focus sprint.`,
                 startedAt: new Date().toISOString(),
                 mcqsAttemptedCount: 2
               });
-              handleTabChange('dashboard');
+              handleTabChange('daily');
             }}
             onOpenCompanion={handleOpenCompanionWithPrompt}
           />
         )}
 
-        {currentTab === 'mcq' && (
-          <McqEngine
-            profile={profile}
-            initialMode={mcqInitialMode}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
-          />
-        )}
-
-        {currentTab === 'library' && (
-          <StudyLibrary
-            onStartDocumentPractice={(docId) => handleStartPractice('document_based', { docId })}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
-          />
-        )}
-
-        {currentTab === 'mistakes' && (
-          <MistakeNotebook
-            onStartParallelTest={(mistakeId) => handleStartPractice('mistake_redo', { mistakeId })}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
-          />
-        )}
-
-        {currentTab === 'roadmap' && (
-          <RoadmapView
-            profile={profile}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
-          />
-        )}
-
-        {currentTab === 'ai-memory' && (
-          <AIMemoryView />
-        )}
-
+        {/* 5. Mentor Dashboard (when role is Mentor) */}
         {currentTab === 'mentor' && (
           <MentorDashboard
             profile={profile}
@@ -149,6 +133,7 @@ export const App: React.FC = () => {
             onOpenCompanion={handleOpenCompanionWithPrompt}
           />
         )}
+
       </main>
 
       {/* Socratic Study Companion Drawer */}
@@ -178,7 +163,7 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="font-serif font-bold text-ink-800 text-sm">Her Study Space</span>
             <span>•</span>
-            <span>MAH-MBA/MMS-CET 2027 Personalized Prep Sanctuary</span>
+            <span>MAH-MBA/MMS-CET 2027 Personalized Prep for {profile.name}</span>
           </div>
           <div className="text-[11px] text-ink-400">
             Target: 13 April 2027 (Date Provisional) • Asia/Kolkata Timezone

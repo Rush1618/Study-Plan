@@ -50,15 +50,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     }));
   };
 
-  const navItems = [
-    { id: 'dashboard', label: "Today's Session", icon: Compass },
+  const navItems: { id: string; label: string; icon: any; badge?: number }[] = [
+    { id: 'daily', label: "Daily Plan", icon: Calendar },
+    { id: 'mcq', label: "MCQs & Practice", icon: CheckCircle2 },
+    { id: 'syllabus', label: "Syllabus & Material", icon: BookOpen },
     { id: 'focus', label: "Focus Room", icon: Clock },
-    { id: 'mcq', label: "MCQ Engine", icon: CheckCircle2 },
-    { id: 'library', label: "Study Library", icon: BookOpen },
-    { id: 'mistakes', label: "Mistake Notebook", icon: AlertCircle, badge: unresolvedMistakesCount },
-    { id: 'roadmap', label: "24-Week Roadmap", icon: Calendar },
-    { id: 'ai-memory', label: "AI Memory", icon: BrainCircuit },
-    ...(profile.role === 'mentor' ? [{ id: 'mentor', label: "Mentor Hub", icon: UserCheck }] : [])
+    ...(profile.role === 'mentor' ? [{ id: 'mentor', label: "Mentor Review", icon: UserCheck }] : [])
   ];
 
   return (
@@ -133,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'text-ink-200 hover:text-white'
               }`}
             >
-              Mentor: Prof. Sharma
+              Mentor: Rushabh
             </button>
           </div>
         </div>
@@ -145,7 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           
           {/* Logo & Product Identity */}
           <div 
-            onClick={() => setCurrentTab('dashboard')}
+            onClick={() => setCurrentTab('daily')}
             className="flex items-center gap-3 cursor-pointer group select-none flex-shrink-0"
           >
             <div className="w-10 h-10 rounded-xl bg-ink-900 text-parchment-50 flex items-center justify-center font-serif text-xl font-bold shadow-soft border border-ink-800 group-hover:bg-terracotta-500 transition-colors">

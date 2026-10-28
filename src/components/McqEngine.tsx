@@ -17,12 +17,17 @@ import {
   ArrowRight,
   TrendingUp,
   BrainCircuit,
-  Award
+  Award,
+  Plus,
+  Search,
+  Filter,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Question, PracticeMode, MistakeRecord, UserProfile, SubjectType } from '../types';
 import { sampleQuestions, sampleMistakes } from '../data/mockData';
 import { LearningEngine } from '../services/learningEngine';
+import { StorageService } from '../services/storage';
 
 interface McqEngineProps {
   profile: UserProfile;
@@ -49,8 +54,29 @@ export const McqEngine: React.FC<McqEngineProps> = ({
   const [showImmediateFeedback, setShowImmediateFeedback] = useState<boolean>(true);
   const [explanationLang, setExplanationLang] = useState<'English' | 'Hinglish'>(profile.preferredLanguage);
 
+  // Question Bank view state
+  const [bankTab, setBankTab] = useState<'launcher' | 'bank'>('launcher');
+  const [bankQuestions, setBankQuestions] = useState<Question[]>(() => StorageService.getQuestions());
+  const [showAddQuestionModal, setShowAddQuestionModal] = useState<boolean>(false);
+  const [bankFilterSubject, setBankFilterSubject] = useState<SubjectType | 'All'>('All');
+  const [bankSearch, setBankSearch] = useState<string>('');
+
+  // Form fields for adding question
+  const [formSubject, setFormSubject] = useState<SubjectType>('Quantitative Aptitude');
+  const [formTopic, setFormTopic] = useState('');
+  const [formSubtopic, setFormSubtopic] = useState('');
+  const [formText, setFormText] = useState('');
+  const [formOptA, setFormOptA] = useState('');
+  const [formOptB, setFormOptB] = useState('');
+  const [formOptC, setFormOptC] = useState('');
+  const [formOptD, setFormOptD] = useState('');
+  const [formOptE, setFormOptE] = useState('');
+  const [formCorrect, setFormCorrect] = useState<'A' | 'B' | 'C' | 'D' | 'E'>('A');
+  const [formExpl, setFormExpl] = useState('');
+  const [formHinglish, setFormHinglish] = useState('');
+
   // Active question state
-  const [activeQuestions, setActiveQuestions] = useState<Question[]>(sampleQuestions);
+  const [activeQuestions, setActiveQuestions] = useState<Question[]>(() => StorageService.getQuestions());
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, 'A' | 'B' | 'C' | 'D' | 'E'>>({});
   const [markedForReview, setMarkedForReview] = useState<Record<string, boolean>>({});
@@ -75,25 +101,79 @@ export const McqEngine: React.FC<McqEngineProps> = ({
     return () => clearInterval(interval);
   }, [isTestRunning, isTestFinished, isExamMode]);
 
+  const handleSaveNewQuestion = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formText.trim() || !formOptA.trim() || !formOptB.trim()) return;
+
+    const newQ: Question = {
+      id: `q-mentor-${Date.now()}`,
+      subject: formSubject,
+      topic: formTopic.trim() || 'General Practice',
+      subtopic: formSubtopic.trim() || 'Core Problems',
+      difficulty: 'CET Standard',
+      questionText: formText.trim(),
+      options: {
+        A: formOptA.trim(),
+        B: formOptB.trim(),
+        C: formOptC.trim() || 'None of these',
+        D: formOptD.trim() || 'Cannot be determined',
+        E: formOptE.trim() || 'Both A and B'
+      },
+      correctAnswer: formCorrect,
+      explanation: formExpl.trim() || 'Standard step-by-step reasoning verified by mentor.',
+      hinglishExplanation: formHinglish.trim() || undefined
+    };
+
+    StorageService.addQuestion(newQ);
+    const updated = StorageService.getQuestions();
+    setBankQuestions(updated);
+    setActiveQuestions(updated);
+
+    // Reset form
+    setFormText('');
+    setFormOptA('');
+    setFormOptB('');
+    setFormOptC('');
+    setFormOptD('');
+    setFormOptE('');
+    setFormExpl('');
+    setFormHinglish('');
+    setShowAddQuestionModal(false);
+  };
+
+  const startSingleQuestionTest = (question: Question) => {
+    setActiveMode('topic');
+    setActiveQuestions([question]);
+    setCurrentIndex(0);
+    setAnswers({});
+    setMarkedForReview({});
+    setShowHint(false);
+    setElapsedSeconds(0);
+    setIsTestFinished(false);
+    setIsTestRunning(true);
+  };
+
   // Start test launcher
   const startTest = (mode: PracticeMode, customQuestions?: Question[]) => {
     setActiveMode(mode);
+    const allStoredQ = StorageService.getQuestions();
     let qs: Question[] = [];
     if (customQuestions && customQuestions.length > 0) {
       qs = customQuestions;
     } else if (mode === 'mistake_redo') {
-      qs = sampleMistakes.map(m => {
-        const found = sampleQuestions.find(q => q.id === m.questionId);
-        return found || sampleQuestions[0];
+      const storedMistakes = StorageService.getMistakes();
+      qs = storedMistakes.map(m => {
+        const found = allStoredQ.find(q => q.id === m.questionId);
+        return found || allStoredQ[0];
       });
+      if (qs.length === 0) qs = allStoredQ;
     } else if (mode === 'ai_adaptive') {
-      // Prioritize percentages and logic where mistakes occurred
-      qs = [sampleQuestions[0], sampleQuestions[1], sampleQuestions[2], sampleQuestions[4], sampleQuestions[5]];
+      qs = allStoredQ.slice(0, 5);
     } else if (selectedSubject !== 'All') {
-      qs = sampleQuestions.filter(q => q.subject === selectedSubject);
-      if (qs.length === 0) qs = sampleQuestions;
+      qs = allStoredQ.filter(q => q.subject === selectedSubject);
+      if (qs.length === 0) qs = allStoredQ;
     } else {
-      qs = sampleQuestions;
+      qs = allStoredQ;
     }
 
     setActiveQuestions(qs.slice(0, questionCount));
@@ -187,45 +267,83 @@ export const McqEngine: React.FC<McqEngineProps> = ({
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-terracotta-600 mb-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Integrated In-App MCQ Engine</span>
+              <span>In-App MCQ Arena & Question Bank</span>
             </div>
             <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
-              Practice & Assessment Arena
+              Practice & Questions Arena
             </h1>
             <p className="text-sm text-ink-700/90 mt-1">
-              Real CET 5-option questions with detailed Socratic explanations and zero external links.
+              5-option CET practice sets with Socratic explanations, plus full visibility into questions entered by Rushabh.
             </p>
           </div>
 
-          {/* Practice Mode vs Exam Simulation Mode Toggle */}
-          <div className="flex items-center bg-parchment-100 p-1.5 rounded-2xl border border-parchment-300">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Tab switch between Practice Modes and Question Bank */}
+            <div className="flex items-center bg-parchment-100 p-1 rounded-2xl border border-parchment-300">
+              <button
+                onClick={() => setBankTab('launcher')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  bankTab === 'launcher' 
+                    ? 'bg-ink-900 text-white shadow-soft' 
+                    : 'text-ink-700 hover:text-ink-900'
+                }`}
+              >
+                🎯 Practice Sets
+              </button>
+              <button
+                onClick={() => setBankTab('bank')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  bankTab === 'bank' 
+                    ? 'bg-ink-900 text-white shadow-soft' 
+                    : 'text-ink-700 hover:text-ink-900'
+                }`}
+              >
+                📚 Question Bank ({bankQuestions.length})
+              </button>
+            </div>
+
+            {/* Add Question Button */}
             <button
-              onClick={() => setIsExamMode(false)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                !isExamMode 
-                  ? 'bg-ink-900 text-white shadow-soft' 
-                  : 'text-ink-700 hover:text-ink-900'
-              }`}
+              onClick={() => setShowAddQuestionModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-terracotta-500 hover:bg-terracotta-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-soft"
             >
-              🌿 Deep Practice Mode
-            </button>
-            <button
-              onClick={() => setIsExamMode(true)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                isExamMode 
-                  ? 'bg-terracotta-500 text-white shadow-soft' 
-                  : 'text-ink-700 hover:text-ink-900'
-              }`}
-            >
-              ⏱️ CET Exam Simulation
+              <Plus className="w-4 h-4" />
+              <span>Enter New MCQ</span>
             </button>
           </div>
         </div>
 
-        {/* 10 Modes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          {/* Mode 1: AI Grounded Adaptive Practice */}
+        {/* SUBTAB 1: PRACTICE MODES */}
+        {bankTab === 'launcher' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-ink-600 uppercase tracking-wider">
+                Select Practice Calibration
+              </span>
+              <div className="flex items-center bg-parchment-100 p-1 rounded-xl border border-parchment-300 text-xs">
+                <button
+                  onClick={() => setIsExamMode(false)}
+                  className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                    !isExamMode ? 'bg-ink-900 text-white shadow-sm' : 'text-ink-600 hover:text-ink-900'
+                  }`}
+                >
+                  🌿 Practice Mode
+                </button>
+                <button
+                  onClick={() => setIsExamMode(true)}
+                  className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                    isExamMode ? 'bg-terracotta-500 text-white shadow-sm' : 'text-ink-600 hover:text-ink-900'
+                  }`}
+                >
+                  ⏱️ Exam Simulation
+                </button>
+              </div>
+            </div>
+
+            {/* 10 Modes Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              {/* Mode 1: AI Grounded Adaptive Practice */}
           <div className="bg-ink-900 text-parchment-50 rounded-3xl p-6 shadow-elevated border border-ink-800 flex flex-col justify-between relative overflow-hidden group">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -387,8 +505,298 @@ export const McqEngine: React.FC<McqEngineProps> = ({
 
         </div>
       </div>
-    );
-  }
+    )}
+
+    {/* SUBTAB 2: QUESTION BANK & ENTERED QUESTIONS */}
+    {bankTab === 'bank' && (
+      <div className="space-y-6">
+        
+        {/* Filters & Search */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-parchment-200">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {(['All', 'Quantitative Aptitude', 'Logical Reasoning', 'Abstract Reasoning', 'Verbal Ability'] as const).map(s => (
+              <button
+                key={s}
+                onClick={() => setBankFilterSubject(s)}
+                className={`px-3 py-1 rounded-xl text-xs font-medium transition-colors ${
+                  bankFilterSubject === s
+                    ? 'bg-ink-900 text-white'
+                    : 'bg-parchment-100 hover:bg-parchment-200 text-ink-700'
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full sm:w-64">
+            <Search className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-3" />
+            <input
+              type="text"
+              value={bankSearch}
+              onChange={(e) => setBankSearch(e.target.value)}
+              placeholder="Search questions by text or topic..."
+              className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-parchment-300 text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-terracotta-400"
+            />
+          </div>
+        </div>
+
+        {/* Questions List */}
+        {(() => {
+          const filteredList = bankQuestions.filter(q => {
+            const matchesSubj = bankFilterSubject === 'All' || q.subject === bankFilterSubject;
+            const matchesSearch = !bankSearch || 
+              q.questionText.toLowerCase().includes(bankSearch.toLowerCase()) ||
+              q.topic.toLowerCase().includes(bankSearch.toLowerCase());
+            return matchesSubj && matchesSearch;
+          });
+
+          if (filteredList.length === 0) {
+            return (
+              <div className="p-12 text-center rounded-3xl bg-white border border-parchment-200 space-y-3">
+                <p className="text-xs text-ink-600">No questions found matching your filter.</p>
+                <button
+                  onClick={() => setShowAddQuestionModal(true)}
+                  className="px-4 py-2 rounded-xl bg-ink-900 text-parchment-50 text-xs font-semibold"
+                >
+                  Enter First MCQ Now
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <div className="space-y-4">
+              {filteredList.map((q, idx) => (
+                <div 
+                  key={q.id}
+                  className="p-6 rounded-3xl bg-white border border-parchment-200 shadow-soft space-y-4 hover:border-terracotta-300 transition-colors"
+                >
+                  {/* Question Header */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-parchment-100">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-terracotta-50 text-terracotta-800 border border-terracotta-200">
+                        {q.subject}
+                      </span>
+                      <span className="text-xs font-semibold text-ink-700">
+                        {q.topic}
+                      </span>
+                      {q.subtopic && (
+                        <span className="text-xs text-ink-400">• {q.subtopic}</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono text-ink-500 bg-parchment-100 px-2 py-0.5 rounded">
+                        {q.difficulty}
+                      </span>
+                      <button
+                        onClick={() => startSingleQuestionTest(q)}
+                        className="px-3 py-1 rounded-xl bg-ink-900 hover:bg-terracotta-500 text-parchment-50 text-xs font-semibold flex items-center gap-1 transition-colors shadow-sm"
+                      >
+                        <span>Practice This</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Question Text */}
+                  <p className="font-serif text-base text-ink-900 leading-relaxed">
+                    {idx + 1}. {q.questionText}
+                  </p>
+
+                  {/* 5 Options Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs">
+                    {(['A', 'B', 'C', 'D', 'E'] as const).map(optKey => {
+                      const isCorrect = q.correctAnswer === optKey;
+                      return (
+                        <div 
+                          key={optKey}
+                          className={`p-3 rounded-xl border flex items-center gap-2.5 transition-all ${
+                            isCorrect 
+                              ? 'bg-sage-50 border-sage-300 text-sage-950 font-semibold' 
+                              : 'bg-parchment-50/50 border-parchment-200 text-ink-800'
+                          }`}
+                        >
+                          <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center flex-shrink-0 ${
+                            isCorrect ? 'bg-sage-600 text-white' : 'bg-parchment-200 text-ink-700'
+                          }`}>
+                            {optKey}
+                          </span>
+                          <span className="flex-1">{q.options[optKey]}</span>
+                          {isCorrect && (
+                            <span className="text-[10px] text-sage-700 font-bold uppercase tracking-wider flex items-center gap-0.5">
+                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              Correct Key
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Explanation Box */}
+                  <div className="p-4 rounded-2xl bg-parchment-50 border border-parchment-200 text-xs space-y-1">
+                    <div className="font-bold text-ink-900 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-terracotta-700">
+                      <Lightbulb className="w-3.5 h-3.5" />
+                      <span>Detailed Explanation & Method</span>
+                    </div>
+                    <p className="text-ink-800 leading-relaxed font-sans text-xs">
+                      {q.explanation}
+                    </p>
+                    {q.hinglishExplanation && (
+                      <p className="text-ink-600 text-[11px] italic pt-1 border-t border-parchment-200">
+                        <strong>Hinglish:</strong> {q.hinglishExplanation}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+      </div>
+    )}
+
+    {/* Enter New MCQ Modal */}
+    {showAddQuestionModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/60 backdrop-blur-sm animate-fadeIn">
+        <div className="bg-white border border-parchment-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-elevated max-h-[90vh] overflow-y-auto">
+          <h2 className="font-serif text-2xl font-bold text-ink-900 mb-1">
+            Enter New MAH-CET Question
+          </h2>
+          <p className="text-xs text-ink-600 mb-6">
+            Add verified questions to Sanskriti's question bank. They will immediately appear in practice sets and topic drills.
+          </p>
+
+          <form onSubmit={handleSaveNewQuestion} className="space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block font-semibold text-ink-800 mb-1">Subject</label>
+                <select
+                  value={formSubject}
+                  onChange={(e) => setFormSubject(e.target.value as SubjectType)}
+                  className="w-full px-3 py-2 rounded-xl border border-parchment-300 text-xs focus:ring-2 focus:ring-terracotta-400 outline-none bg-white"
+                >
+                  <option value="Logical Reasoning">Logical Reasoning</option>
+                  <option value="Abstract Reasoning">Abstract Reasoning</option>
+                  <option value="Quantitative Aptitude">Quantitative Aptitude</option>
+                  <option value="Verbal Ability">Verbal Ability</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-ink-800 mb-1">Topic Name</label>
+                <input
+                  type="text"
+                  required
+                  value={formTopic}
+                  onChange={(e) => setFormTopic(e.target.value)}
+                  placeholder="e.g. Percentages, Puzzles"
+                  className="w-full px-3 py-2 rounded-xl border border-parchment-300 text-xs focus:ring-2 focus:ring-terracotta-400 outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-ink-800 mb-1">Question Text</label>
+              <textarea
+                required
+                rows={3}
+                value={formText}
+                onChange={(e) => setFormText(e.target.value)}
+                placeholder="Enter the complete CET question statement here..."
+                className="w-full px-3 py-2 rounded-xl border border-parchment-300 text-xs focus:ring-2 focus:ring-terracotta-400 outline-none"
+              />
+            </div>
+
+            {/* 5 Options Inputs */}
+            <div className="space-y-2">
+              <label className="block font-semibold text-ink-800">
+                5 Options & Select Correct Key:
+              </label>
+
+              {(['A', 'B', 'C', 'D', 'E'] as const).map(optKey => {
+                const val = optKey === 'A' ? formOptA : optKey === 'B' ? formOptB : optKey === 'C' ? formOptC : optKey === 'D' ? formOptD : formOptE;
+                const setVal = optKey === 'A' ? setFormOptA : optKey === 'B' ? setFormOptB : optKey === 'C' ? setFormOptC : optKey === 'D' ? setFormOptD : setFormOptE;
+
+                return (
+                  <div key={optKey} className="flex items-center gap-2">
+                    <label className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs cursor-pointer transition-colors ${
+                      formCorrect === optKey ? 'bg-sage-600 text-white' : 'bg-parchment-200 text-ink-800'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="correctOpt"
+                        checked={formCorrect === optKey}
+                        onChange={() => setFormCorrect(optKey)}
+                        className="hidden"
+                      />
+                      {optKey}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={val}
+                      onChange={(e) => setVal(e.target.value)}
+                      placeholder={`Option ${optKey} text`}
+                      className="flex-1 px-3 py-2 rounded-xl border border-parchment-300 text-xs focus:ring-2 focus:ring-terracotta-400 outline-none"
+                    />
+                  </div>
+                );
+              })}
+              <p className="text-[11px] text-ink-500 pl-1">
+                Click an option letter (A, B, C, D, E) to mark it as the correct answer key (turns green).
+              </p>
+            </div>
+
+            {/* Explanations */}
+            <div>
+              <label className="block font-semibold text-ink-800 mb-1">Step-by-Step Explanation</label>
+              <textarea
+                rows={2}
+                value={formExpl}
+                onChange={(e) => setFormExpl(e.target.value)}
+                placeholder="Clear mathematical or logical derivation..."
+                className="w-full px-3 py-2 rounded-xl border border-parchment-300 text-xs focus:ring-2 focus:ring-terracotta-400 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-ink-800 mb-1">Hinglish Explanation (Optional)</label>
+              <textarea
+                rows={2}
+                value={formHinglish}
+                onChange={(e) => setFormHinglish(e.target.value)}
+                placeholder="Aasan shabdon me samjhana ho to yahan likhein..."
+                className="w-full px-3 py-2 rounded-xl border border-parchment-300 text-xs focus:ring-2 focus:ring-terracotta-400 outline-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-parchment-200">
+              <button
+                type="button"
+                onClick={() => setShowAddQuestionModal(false)}
+                className="px-4 py-2 rounded-xl border border-parchment-300 text-ink-700 hover:bg-parchment-100 font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-xl bg-ink-900 hover:bg-terracotta-500 text-parchment-50 font-semibold shadow-soft"
+              >
+                Save to Question Bank
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+
+  </div>
+);
+}
 
   // 2. ACTIVE TEST-TAKING ARENA
   if (isTestRunning && currentQ) {

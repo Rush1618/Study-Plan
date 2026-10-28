@@ -237,7 +237,7 @@ export const DailyPlanView: React.FC<DailyPlanViewProps> = ({
                     </h3>
 
                     {task.mentorNote && (
-                      <p className="text-xs text-amber-900 bg-amber-50/80 border-l-2 border-amber-400 px-2.5 py-1 mt-2 rounded-r-md">
+                      <p className="text-xs text-amber-900 bg-amber-50/80 border border-amber-200/80 px-3 py-1.5 mt-2 rounded-xl">
                         <strong>Mentor Note:</strong> {task.mentorNote}
                       </p>
                     )}
