@@ -1049,42 +1049,10 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
             <BookOpen className="w-3.5 h-3.5 text-terracotta-600" />
             <span>Select Chapter:</span>
           </span>
-          <button
-            onClick={handleInductInternetAndSyllabus}
-            disabled={isAiLearning}
-            className="text-xs text-terracotta-700 hover:text-terracotta-800 font-semibold flex items-center gap-1 transition-colors min-h-[40px] px-2"
-          >
-            <Globe className={`w-3.5 h-3.5 ${isAiLearning ? 'animate-spin' : ''}`} />
-            <span>{isAiLearning ? "Learning from Syllabus..." : "Induct Syllabus with Ruvi"}</span>
-          </button>
+          <span className="text-[11px] text-ink-500 font-medium">
+            MAH-CET English & VARC Syllabus
+          </span>
         </div>
-
-        {/* AI Learning Progress Banner */}
-        {isAiLearning && (
-          <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 space-y-1.5 animate-fadeIn">
-            <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="flex items-center gap-1.5">
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-700" />
-                <span>Ruvi Syllabus Induction</span>
-              </span>
-              <span>{aiLearningProgress}%</span>
-            </div>
-            <div className="h-1.5 w-full bg-amber-200/60 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-terracotta-600 rounded-full transition-all duration-300" 
-                style={{ width: `${aiLearningProgress}%` }}
-              />
-            </div>
-            <p className="text-[11px] text-amber-800 font-sans">{aiLearningStage}</p>
-          </div>
-        )}
-
-        {aiSynthesizedBadge && (
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2 animate-fadeIn font-medium">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span>{aiSynthesizedBadge}</span>
-          </div>
-        )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {CHAPTERS.map(ch => {

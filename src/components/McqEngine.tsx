@@ -195,7 +195,7 @@ export const McqEngine: React.FC<McqEngineProps> = ({
 
   // Launch test from URL query parameters (e.g., from Daily Plan or Syllabus)
   useEffect(() => {
-    if (urlSubject && urlSubject !== 'All') {
+    if (urlSubject && (urlSubject as string) !== 'All') {
       setSelectedSubject(urlSubject);
     }
     if (urlTopic) {

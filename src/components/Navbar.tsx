@@ -405,29 +405,3 @@ export const Navbar: React.FC<NavbarProps> = ({
     </>
   );
 };
-                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
-                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
-                }`}
-              >
-                <UserCheck className="w-4 h-4 text-sage-600" />
-                <div className="text-xs font-medium">Mentor Review</div>
-                <div className="text-[10px] text-ink-500">Progress Oversight</div>
-              </button>
-            </div>
-
-            <div className="pt-2 border-t border-parchment-200 flex items-center justify-between text-xs text-ink-600">
-              <span className="text-[11px]">Role: <strong className="text-ink-900">{profile.role === 'student' ? 'Sanskriti' : 'Mentor'}</strong></span>
-              <button
-                onClick={toggleRole}
-                className="text-[11px] text-terracotta-600 font-semibold underline"
-              >
-                Switch Role
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-    </>
-  );
-};

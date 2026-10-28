@@ -36,9 +36,9 @@ export function exitBrowserFullscreenSynchronous(): void {
 /**
  * Factory for creating strongly-typed session launch payloads.
  */
-export function createSessionPayload(options: {
-  subject: SubjectType;
-  topicName: string;
+export function createSessionPayload(options?: {
+  subject?: SubjectType;
+  topicName?: string;
   topicId?: string;
   taskId?: string;
   plannedDurationMinutes?: number;
@@ -47,16 +47,17 @@ export function createSessionPayload(options: {
   returnDestination?: 'daily' | 'syllabus' | 'roadmap' | 'companion' | 'mistakes';
   autoFullscreen?: boolean;
 }): StudySessionLaunchPayload {
+  const opts = options || {};
   return {
     sessionId: `sess-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    taskId: options.taskId,
-    subject: options.subject,
-    topicId: options.topicId,
-    topicName: options.topicName,
-    plannedDurationMinutes: options.plannedDurationMinutes || 25,
-    quizMode: options.quizMode || 'practice',
-    sourceContentIds: options.sourceContentIds || [],
-    returnDestination: options.returnDestination || 'daily',
-    autoFullscreen: options.autoFullscreen !== false
+    taskId: opts.taskId,
+    subject: opts.subject || 'Verbal Ability',
+    topicId: opts.topicId,
+    topicName: opts.topicName || 'General Focus Session',
+    plannedDurationMinutes: opts.plannedDurationMinutes || 25,
+    quizMode: opts.quizMode || 'practice',
+    sourceContentIds: opts.sourceContentIds || [],
+    returnDestination: opts.returnDestination || 'daily',
+    autoFullscreen: opts.autoFullscreen !== false
   };
 }
