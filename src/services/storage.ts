@@ -81,7 +81,15 @@ export const StorageService = {
   getQuestions(): Question[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
-      return data ? JSON.parse(data) : sampleQuestions;
+      if (!data) return sampleQuestions;
+      const parsed: Question[] = JSON.parse(data);
+      if (parsed.length < sampleQuestions.length) {
+        const existingIds = new Set(parsed.map(q => q.id));
+        const merged = [...parsed, ...sampleQuestions.filter(q => !existingIds.has(q.id))];
+        localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(merged));
+        return merged;
+      }
+      return parsed;
     } catch {
       return sampleQuestions;
     }

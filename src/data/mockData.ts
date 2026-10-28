@@ -7,6 +7,7 @@ import {
   RoadmapWeek,
   UserProfile 
 } from '../types';
+import { extractedVocabQuestions } from './extractedVocabQuestions';
 
 export const initialUserProfile: UserProfile = {
   name: "Sanskriti",
@@ -17,11 +18,12 @@ export const initialUserProfile: UserProfile = {
   totalWeeks: 24,
   dailyGoalHours: 3.5,
   preferredLanguage: "English",
-  companionName: "Study Companion",
+  companionName: "J.A.R.V.I.S.",
   role: "student"
 };
 
 export const sampleQuestions: Question[] = [
+  ...extractedVocabQuestions,
   {
     id: "q-cet-qa-01",
     subject: "Quantitative Aptitude",

@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import { 
-  Compass, 
   BookOpen, 
   CheckCircle2, 
   AlertCircle, 
@@ -9,7 +9,10 @@ import {
   Bot, 
   Languages,
   Clock,
-  Cloud
+  Cloud,
+  Map,
+  MoreHorizontal,
+  X
 } from 'lucide-react';
 import { UserProfile } from '../types';
 
@@ -36,6 +39,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSyncModal,
   syncStatus = 'idle'
 }) => {
+  const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
+
   const toggleRole = () => {
     setProfile(prev => ({
       ...prev,
@@ -50,185 +55,290 @@ export const Navbar: React.FC<NavbarProps> = ({
     }));
   };
 
-  const navItems: { id: string; label: string; icon: any; badge?: number }[] = [
-    { id: 'daily', label: "Daily Plan", icon: Calendar },
-    { id: 'mcq', label: "MCQs & Practice", icon: CheckCircle2 },
-    { id: 'syllabus', label: "Syllabus & Material", icon: BookOpen },
-    { id: 'focus', label: "Focus Room", icon: Clock },
-    ...(profile.role === 'mentor' ? [{ id: 'mentor', label: "Mentor Review", icon: UserCheck }] : [])
+  const navItems = [
+    { id: 'daily', label: 'Today', icon: Calendar },
+    { id: 'companion', label: 'Companion', icon: Bot },
+    { id: 'mcq', label: 'Practice', icon: CheckCircle2 },
+    { id: 'mistakes', label: 'Mistakes', icon: AlertCircle, badge: unresolvedMistakesCount },
+    { id: 'syllabus', label: 'Syllabus', icon: BookOpen },
+    { id: 'roadmap', label: 'Roadmap', icon: Map },
+    { id: 'focus', label: 'Focus Room', icon: Clock },
+    { id: 'memory', label: 'AI Memory', icon: BrainCircuit },
+    ...(profile.role === 'mentor' ? [{ id: 'mentor', label: 'Mentor Review', icon: UserCheck }] : [])
   ];
 
+  const mobileTabs = [
+    { id: 'daily', label: 'Today', icon: Calendar },
+    { id: 'companion', label: 'Companion', icon: Bot },
+    { id: 'mcq', label: 'Practice', icon: CheckCircle2 },
+    { id: 'mistakes', label: 'Mistakes', icon: AlertCircle, badge: unresolvedMistakesCount },
+  ];
+
+  const handleSelectTab = (tab: string) => {
+    setCurrentTab(tab);
+    setIsMobileMoreOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-40 bg-parchment-50/95 backdrop-blur-md border-b border-parchment-200 transition-colors">
-      {/* Top micro-bar: Exam context and status banner */}
-      <div className="bg-ink-900 text-parchment-100 text-xs py-1.5 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2 border-b border-ink-800">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-terracotta-400 animate-pulse"></span>
-          <span className="font-medium tracking-wide">MAH-MBA/MMS-CET 2027</span>
-          <span className="text-ink-200/60 hidden md:inline">•</span>
-          <span className="text-ink-200/80 text-[11px] bg-ink-800 px-2 py-0.5 rounded border border-ink-700">
-            Exam Date Provisional (Target: 13 April 2027)
-          </span>
-          <span className="text-ink-200/60 hidden lg:inline">•</span>
-          <span className="text-ink-200/80 hidden lg:inline text-[11px]">
-            Week 1 of 24 (Started 28 Oct 2026)
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 sm:gap-4 text-[11px]">
-          {/* Cloud Sync Status Button */}
-          {onOpenSyncModal && (
-            <button
-              onClick={onOpenSyncModal}
-              className="flex items-center gap-1.5 text-parchment-200 hover:text-white transition-colors px-2 py-0.5 rounded hover:bg-ink-800 border border-transparent hover:border-ink-700"
-              title="Supabase Cloud Synchronization Settings"
+    <>
+      {/* Unified Calm Header - No jarring dark cockpit bar */}
+      <header className="sticky top-0 z-40 bg-parchment-50/90 backdrop-blur-md border-b border-parchment-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
+            
+            {/* Brand Wordmark */}
+            <button 
+              onClick={() => handleSelectTab('daily')}
+              className="flex items-center gap-3 text-left group"
             >
-              <Cloud className="w-3.5 h-3.5 text-terracotta-400" />
-              <span className="flex items-center gap-1">
-                <span>Cloud:</span>
-                <span className={`w-1.5 h-1.5 rounded-full ${
-                  syncStatus === 'connected' 
-                    ? 'bg-sage-400 animate-pulse' 
-                    : syncStatus === 'error'
-                    ? 'bg-rose-400'
-                    : 'bg-amber-400'
-                }`} />
-                <span className="font-medium text-white">
-                  {syncStatus === 'connected' ? 'Synced' : 'Local'}
-                </span>
-              </span>
-            </button>
-          )}
-
-          {/* Language toggle */}
-          <button 
-            onClick={toggleLanguage}
-            className="flex items-center gap-1.5 text-parchment-200 hover:text-white transition-colors px-2 py-0.5 rounded hover:bg-ink-800 border border-transparent hover:border-ink-700"
-            title="Toggle between English and Hinglish explanations"
-          >
-            <Languages className="w-3.5 h-3.5 text-terracotta-400" />
-            <span>Expl: <strong className="text-white">{profile.preferredLanguage}</strong></span>
-          </button>
-
-          {/* Role switcher toggle */}
-          <div className="flex items-center bg-ink-950 p-0.5 rounded-full border border-ink-700">
-            <button
-              onClick={toggleRole}
-              className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium transition-all ${
-                profile.role === 'student' 
-                  ? 'bg-terracotta-500 text-white shadow-sm' 
-                  : 'text-ink-200 hover:text-white'
-              }`}
-            >
-              Student: {profile.name}
-            </button>
-            <button
-              onClick={toggleRole}
-              className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium transition-all ${
-                profile.role === 'mentor' 
-                  ? 'bg-ink-700 text-white shadow-sm' 
-                  : 'text-ink-200 hover:text-white'
-              }`}
-            >
-              Mentor: Rushabh
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main navigation container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
-          
-          {/* Logo & Product Identity */}
-          <div 
-            onClick={() => setCurrentTab('daily')}
-            className="flex items-center gap-3 cursor-pointer group select-none flex-shrink-0"
-          >
-            <div className="w-10 h-10 rounded-xl bg-ink-900 text-parchment-50 flex items-center justify-center font-serif text-xl font-bold shadow-soft border border-ink-800 group-hover:bg-terracotta-500 transition-colors">
-              H
-            </div>
-            <div>
-              <div className="font-serif text-lg font-bold tracking-tight text-ink-900 group-hover:text-terracotta-600 transition-colors">
-                Her Study Space
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-parchment-200 border border-parchment-300 text-ink-900 flex items-center justify-center font-serif text-base sm:text-lg font-bold group-hover:bg-terracotta-100 group-hover:border-terracotta-300 group-hover:text-terracotta-700 transition-colors">
+                H
               </div>
-              <p className="text-[11px] text-ink-500/90 font-medium tracking-wide">
-                One focused session at a time.
-              </p>
+              <div>
+                <span className="font-serif text-base sm:text-lg font-bold tracking-tight text-ink-900 block leading-tight">
+                  Her Study Space
+                </span>
+                <span className="text-[11px] text-ink-500 font-normal hidden sm:block">
+                  MAH-MBA/MMS-CET 2027
+                </span>
+              </div>
+            </button>
+
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleSelectTab(item.id)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors relative min-h-[36px] ${
+                      isActive 
+                        ? 'bg-parchment-200 text-ink-900 font-semibold' 
+                        : 'text-ink-600 hover:text-ink-900 hover:bg-parchment-100'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-terracotta-600' : 'text-ink-400'}`} />
+                    <span>{item.label}</span>
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Right Controls: Language, Role & Companion */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              
+              {/* Cloud Sync */}
+              {onOpenSyncModal && (
+                <button
+                  onClick={onOpenSyncModal}
+                  className="p-2 sm:px-2.5 sm:py-1 rounded-lg text-xs text-ink-600 hover:text-ink-900 hover:bg-parchment-100 border border-transparent hover:border-parchment-200 transition-colors flex items-center gap-1.5"
+                  title="Cloud Sync"
+                >
+                  <Cloud className="w-3.5 h-3.5 text-ink-500" />
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    syncStatus === 'connected' ? 'bg-sage-600' : 'bg-amber-500'
+                  }`} />
+                  <span className="hidden sm:inline text-[11px] font-medium">
+                    {syncStatus === 'connected' ? 'Synced' : 'Local'}
+                  </span>
+                </button>
+              )}
+
+              {/* Language Switcher */}
+              <button
+                onClick={toggleLanguage}
+                className="px-2.5 py-1 rounded-lg text-xs font-medium text-ink-700 hover:text-ink-900 hover:bg-parchment-100 border border-parchment-200 transition-colors flex items-center gap-1"
+                title="Toggle Language"
+              >
+                <Languages className="w-3.5 h-3.5 text-terracotta-600" />
+                <span className="text-[11px]">{profile.preferredLanguage}</span>
+              </button>
+
+              {/* Role Toggle */}
+              <button
+                onClick={toggleRole}
+                className="px-2.5 py-1 rounded-lg text-xs font-medium bg-parchment-100 hover:bg-parchment-200 border border-parchment-200 text-ink-800 transition-colors hidden sm:flex items-center gap-1.5"
+                title="Switch between Sanskriti and Mentor view"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-terracotta-500"></span>
+                <span className="text-[11px]">
+                  {profile.role === 'student' ? 'Sanskriti' : 'Mentor'}
+                </span>
+              </button>
+
+              {/* Ask Companion Trigger */}
+              <button
+                onClick={openCompanion}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  isCompanionOpen
+                    ? 'bg-terracotta-500 text-white border-terracotta-600'
+                    : 'bg-parchment-100 hover:bg-parchment-200 text-ink-800 border-parchment-300'
+                }`}
+                title="Ask Study Companion"
+              >
+                <Bot className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">Companion</span>
+              </button>
+
             </div>
           </div>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 overflow-x-auto py-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentTab(item.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all relative ${
-                    isActive 
-                      ? 'bg-ink-900 text-parchment-50 shadow-sm' 
-                      : 'text-ink-700 hover:text-ink-900 hover:bg-parchment-100'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-terracotta-400' : 'text-ink-500'}`} />
-                  <span>{item.label}</span>
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                      isActive 
-                        ? 'bg-terracotta-500 text-white' 
-                        : 'bg-terracotta-100 text-terracotta-700'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Right Action: AI Companion Drawer Toggle */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={openCompanion}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
-                isCompanionOpen
-                  ? 'bg-terracotta-500 text-white border-terracotta-600 shadow-soft'
-                  : 'bg-parchment-100 hover:bg-terracotta-50 text-ink-900 hover:text-terracotta-700 border-parchment-300'
-              }`}
-              title="Open Socratic AI Study Companion"
-            >
-              <Bot className="w-4 h-4 text-terracotta-600 group-hover:rotate-6 transition-transform" />
-              <span className="hidden sm:inline">Ask Companion</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            </button>
-          </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation bar */}
-        <div className="md:hidden flex items-center justify-between overflow-x-auto py-2 border-t border-parchment-200 gap-2">
-          {navItems.map((item) => {
+      {/* MOBILE BOTTOM NAVIGATION BAR (Thumb Zone, comfortable touch targets, safe area) */}
+      <nav 
+        aria-label="Mobile Navigation"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-parchment-50/95 backdrop-blur-lg border-t border-parchment-200 bottom-mobile-nav"
+      >
+        <div className="grid grid-cols-5 h-14 max-w-md mx-auto items-center px-1">
+          {mobileTabs.map((item) => {
             const Icon = item.icon;
             const isActive = currentTab === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentTab(item.id)}
-                className={`flex flex-col items-center py-1 px-2.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors ${
-                  isActive 
-                    ? 'text-terracotta-600 font-bold bg-terracotta-50' 
-                    : 'text-ink-700 hover:text-ink-900'
+                onClick={() => handleSelectTab(item.id)}
+                className={`flex flex-col items-center justify-center h-full min-h-[48px] rounded-lg transition-colors relative ${
+                  isActive ? 'text-terracotta-700 font-semibold' : 'text-ink-500 hover:text-ink-800'
                 }`}
               >
-                <Icon className="w-4 h-4 mb-0.5" />
-                <span>{item.label}</span>
+                <div className="relative">
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-terracotta-600 stroke-[2.2]' : 'text-ink-400'}`} />
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] mt-1 leading-none">{item.label}</span>
+                {isActive && (
+                  <span className="w-1 h-1 rounded-full bg-terracotta-500 mt-0.5"></span>
+                )}
               </button>
             );
           })}
+
+          {/* More Drawer */}
+          <button
+            onClick={() => setIsMobileMoreOpen(true)}
+            className={`flex flex-col items-center justify-center h-full min-h-[48px] rounded-lg transition-colors ${
+              ['roadmap', 'focus', 'memory', 'mentor'].includes(currentTab)
+                ? 'text-terracotta-700 font-semibold'
+                : 'text-ink-500 hover:text-ink-800'
+            }`}
+          >
+            <MoreHorizontal className="w-5 h-5" />
+            <span className="text-[10px] mt-1 leading-none">More</span>
+          </button>
         </div>
-      </div>
-    </header>
+      </nav>
+
+      {/* MOBILE "MORE" SHEET */}
+      {isMobileMoreOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-ink-950/20 backdrop-blur-sm animate-fadeIn">
+          <div 
+            className="flex-1"
+            onClick={() => setIsMobileMoreOpen(false)}
+          ></div>
+          <div className="bg-parchment-50 border-t border-parchment-300 rounded-t-2xl p-5 shadow-elevated space-y-4 max-h-[80vh] overflow-y-auto bottom-mobile-nav">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-parchment-200">
+              <h3 className="font-serif text-base font-bold text-ink-900">Study Sanctuary</h3>
+              <button
+                onClick={() => setIsMobileMoreOpen(false)}
+                className="w-7 h-7 rounded-full bg-parchment-200 text-ink-700 flex items-center justify-center hover:bg-parchment-300"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={() => handleSelectTab('syllabus')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  currentTab === 'syllabus'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-terracotta-600" />
+                <div className="text-xs font-medium">Syllabus & Notes</div>
+                <div className="text-[10px] text-ink-500">CET Weightage & Docs</div>
+              </button>
+
+              <button
+                onClick={() => handleSelectTab('roadmap')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  currentTab === 'roadmap'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <Map className="w-4 h-4 text-indigo-600" />
+                <div className="text-xs font-medium">24-Week Roadmap</div>
+                <div className="text-[10px] text-ink-500">Phases & Milestones</div>
+              </button>
+
+              <button
+                onClick={() => handleSelectTab('focus')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  currentTab === 'focus'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <Clock className="w-4 h-4 text-amber-600" />
+                <div className="text-xs font-medium">Focus Room</div>
+                <div className="text-[10px] text-ink-500">Timed Sprints</div>
+              </button>
+
+              <button
+                onClick={() => handleSelectTab('memory')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  currentTab === 'memory'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <BrainCircuit className="w-4 h-4 text-terracotta-600" />
+                <div className="text-xs font-medium">AI Memory</div>
+                <div className="text-[10px] text-ink-500">Inspect Hypotheses</div>
+              </button>
+
+              <button
+                onClick={() => handleSelectTab('mentor')}
+                className={`p-3 rounded-xl border text-left transition-colors flex flex-col gap-1.5 ${
+                  currentTab === 'mentor'
+                    ? 'bg-parchment-200 border-parchment-300 font-semibold text-ink-900'
+                    : 'bg-white border-parchment-200 text-ink-800 hover:bg-parchment-100'
+                }`}
+              >
+                <UserCheck className="w-4 h-4 text-sage-600" />
+                <div className="text-xs font-medium">Mentor Review</div>
+                <div className="text-[10px] text-ink-500">Progress Oversight</div>
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-parchment-200 flex items-center justify-between text-xs text-ink-600">
+              <span className="text-[11px]">Role: <strong className="text-ink-900">{profile.role === 'student' ? 'Sanskriti' : 'Mentor'}</strong></span>
+              <button
+                onClick={toggleRole}
+                className="text-[11px] text-terracotta-600 font-semibold underline"
+              >
+                Switch Role
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
   );
 };

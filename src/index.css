@@ -1,3 +1,6 @@
+/* hallmark: v2.0.0 · theme: sanctuary · mode: operate · responsive: mobile-first */
+/* critique: tactile mobile sanctuary with thumb-reach ergonomics, safe-area padding, and serene editorial typography */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,25 +8,61 @@
 @layer base {
   :root {
     --bg-parchment: #FDFBF7;
+    --bg-parchment-subtle: #F9F5EC;
+    --border-parchment: #F0EAD8;
     --ink-primary: #142823;
+    --ink-secondary: #244B43;
     --terracotta: #C85A32;
+    --sage: #24563F;
+    
+    /* Mobile Safe Area Inset Tokens */
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+  }
+
+  html {
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     background-color: #FDFBF7;
     color: #142823;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    overflow-x: clip;
+    touch-action: manipulation;
   }
 
   h1, h2, h3, .font-editorial {
     font-family: 'Fraunces', 'Newsreader', Georgia, serif;
+    overflow-wrap: break-word;
+  }
+
+  /* Prevent automatic iOS zoom when focusing inputs on phone screens */
+  input, textarea, select {
+    font-size: 16px;
+  }
+
+  @media (min-width: 640px) {
+    input, textarea, select {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Universal focus-visible accessibility indicator */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #FDFBF7, 0 0 0 4px #C85A32;
   }
 }
 
 /* Custom subtle scrollbars fitting the paper sanctuary */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -39,10 +78,29 @@
   background: #B6AA93;
 }
 
-/* Editorial badge styling */
+/* Subtle, dignified badge styling without small-cap tracking */
 .editorial-badge {
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-size: 0.6875rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
 }
+
+/* Mobile Bottom Navigation Safe-Area Spacing */
+.pb-mobile-nav {
+  padding-bottom: calc(4.75rem + var(--sab));
+}
+
+.bottom-mobile-nav {
+  padding-bottom: max(0.5rem, var(--sab));
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

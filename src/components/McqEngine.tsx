@@ -21,7 +21,8 @@ import {
   Plus,
   Search,
   Filter,
-  Check
+  Check,
+  BookOpen
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Question, PracticeMode, MistakeRecord, UserProfile, SubjectType } from '../types';
@@ -265,12 +266,8 @@ export const McqEngine: React.FC<McqEngineProps> = ({
       <div className="space-y-8 animate-fadeIn">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-terracotta-600 mb-1">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>In-App MCQ Arena & Question Bank</span>
-            </div>
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
-              Practice & Questions Arena
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
+              Practice & Question Bank
             </h1>
             <p className="text-sm text-ink-700/90 mt-1">
               5-option CET practice sets with Socratic explanations, plus full visibility into questions entered by Rushabh.
@@ -279,35 +276,37 @@ export const McqEngine: React.FC<McqEngineProps> = ({
 
           <div className="flex flex-wrap items-center gap-2">
             {/* Tab switch between Practice Modes and Question Bank */}
-            <div className="flex items-center bg-parchment-100 p-1 rounded-2xl border border-parchment-300">
+            <div className="flex items-center bg-parchment-100 p-1 rounded-xl border border-parchment-300">
               <button
                 onClick={() => setBankTab('launcher')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   bankTab === 'launcher' 
-                    ? 'bg-ink-900 text-white shadow-soft' 
+                    ? 'bg-ink-900 text-white shadow-sm' 
                     : 'text-ink-700 hover:text-ink-900'
                 }`}
               >
-                🎯 Practice Sets
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Practice Sets</span>
               </button>
               <button
                 onClick={() => setBankTab('bank')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   bankTab === 'bank' 
-                    ? 'bg-ink-900 text-white shadow-soft' 
+                    ? 'bg-ink-900 text-white shadow-sm' 
                     : 'text-ink-700 hover:text-ink-900'
                 }`}
               >
-                📚 Question Bank ({bankQuestions.length})
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Question Bank ({bankQuestions.length})</span>
               </button>
             </div>
 
             {/* Add Question Button */}
             <button
               onClick={() => setShowAddQuestionModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-terracotta-500 hover:bg-terracotta-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-soft"
+              className="px-3.5 py-2 rounded-xl bg-terracotta-500 hover:bg-terracotta-600 text-white text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
               <span>Enter New MCQ</span>
             </button>
           </div>
@@ -317,25 +316,25 @@ export const McqEngine: React.FC<McqEngineProps> = ({
         {bankTab === 'launcher' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-ink-600 uppercase tracking-wider">
-                Select Practice Calibration
+              <span className="text-xs font-semibold text-ink-700">
+                Practice Calibration
               </span>
               <div className="flex items-center bg-parchment-100 p-1 rounded-xl border border-parchment-300 text-xs">
                 <button
                   onClick={() => setIsExamMode(false)}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                  className={`px-3 py-1 rounded-lg font-medium transition-colors ${
                     !isExamMode ? 'bg-ink-900 text-white shadow-sm' : 'text-ink-600 hover:text-ink-900'
                   }`}
                 >
-                  🌿 Practice Mode
+                  Learning Mode
                 </button>
                 <button
                   onClick={() => setIsExamMode(true)}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                  className={`px-3 py-1 rounded-lg font-medium transition-colors ${
                     isExamMode ? 'bg-terracotta-500 text-white shadow-sm' : 'text-ink-600 hover:text-ink-900'
                   }`}
                 >
-                  ⏱️ Exam Simulation
+                  Timed CET Simulation
                 </button>
               </div>
             </div>
@@ -850,7 +849,7 @@ export const McqEngine: React.FC<McqEngineProps> = ({
         {/* Question Palette Drawer (Collapsible) */}
         {showPalette && (
           <div className="p-4 rounded-2xl bg-parchment-100 border border-parchment-300 shadow-soft animate-fadeIn">
-            <div className="text-xs font-bold text-ink-800 uppercase tracking-wider mb-3 flex items-center justify-between">
+            <div className="text-xs font-semibold text-ink-800 mb-3 flex items-center justify-between">
               <span>Question Palette ({activeQuestions.length} Questions)</span>
               <div className="flex items-center gap-3 text-[11px] font-normal">
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-sage-500"></span> Answered</span>
@@ -876,7 +875,7 @@ export const McqEngine: React.FC<McqEngineProps> = ({
                       setCurrentIndex(idx);
                       setShowHint(false);
                     }}
-                    className={`w-8 h-8 rounded-lg text-xs font-bold border transition-all ${colorClasses} ${
+                    className={`w-8 h-8 rounded-lg text-xs font-bold border transition-colors ${colorClasses} ${
                       current ? 'ring-2 ring-terracotta-500 scale-105' : ''
                     }`}
                   >
@@ -889,13 +888,13 @@ export const McqEngine: React.FC<McqEngineProps> = ({
         )}
 
         {/* Main Question Presentation Card */}
-        <div className="bg-parchment-50 border border-parchment-200 rounded-3xl p-6 sm:p-8 shadow-soft space-y-6">
+        <div className="bg-parchment-50 border border-parchment-200 rounded-3xl p-5 sm:p-8 shadow-soft space-y-6">
           
           {/* Question Text */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-terracotta-600 tracking-wide">
-                Topic: {currentQ.topic} • {currentQ.subtopic}
+              <span className="text-xs font-medium text-terracotta-700 tracking-normal">
+                Topic: {currentQ.topic} / {currentQ.subtopic}
               </span>
               <button
                 onClick={handleToggleBookmark}
@@ -924,8 +923,16 @@ export const McqEngine: React.FC<McqEngineProps> = ({
               return (
                 <div
                   key={optKey}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleSelectOption(optKey)}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center justify-between gap-4 group ${
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelectOption(optKey);
+                    }
+                  }}
+                  className={`p-4 rounded-2xl border cursor-pointer transition-colors flex items-center justify-between gap-4 group min-h-[52px] ${
                     isSelected 
                       ? 'bg-parchment-100 border-terracotta-500 ring-1 ring-terracotta-400/50 shadow-sm' 
                       : 'bg-white border-parchment-200 hover:border-ink-400 hover:bg-parchment-50/50'
@@ -1012,7 +1019,7 @@ export const McqEngine: React.FC<McqEngineProps> = ({
 
               <button
                 onClick={handleToggleMarkReview}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-colors ${
                   isMarked 
                     ? 'bg-purple-100 text-purple-800 border-purple-300' 
                     : 'bg-parchment-100 hover:bg-parchment-200 text-ink-700 border-parchment-300'

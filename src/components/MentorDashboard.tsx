@@ -104,14 +104,10 @@ Supervision assigned to Prof. V. Sharma. Weekly calibration adjusts daily questi
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-700 mb-1">
-            <UserCheck className="w-3.5 h-3.5 text-terracotta-600" />
-            <span>Authorized Mentor Oversight: Prof. V. Sharma</span>
-          </div>
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
-            Student Supervision: {profile.name}
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
+            Mentor Oversight: {profile.name}
           </h1>
-          <p className="text-sm text-ink-700/90 mt-1">
+          <p className="text-xs sm:text-sm text-ink-700/90 mt-1">
             Real-time audit of {profile.name}'s cognitive history, AI recommendation rationale, and syllabus progress.
           </p>
         </div>

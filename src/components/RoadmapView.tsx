@@ -67,24 +67,20 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-terracotta-600 mb-1">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Structured 24-Week Journey</span>
-          </div>
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
-            MAH-CET 2027 Adaptive Study Roadmap
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
+            24-Week Preparation Roadmap
           </h1>
-          <p className="text-sm text-ink-700/90 mt-1">
-            From foundation to mock calibration. 28 October 2026 → 13 April 2027.
+          <p className="text-xs sm:text-sm text-ink-700/90 mt-1">
+            From foundation to mock calibration · 28 October 2026 to 13 April 2027.
           </p>
         </div>
 
         {/* Caution Banner: Date Unconfirmed */}
-        <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center gap-2.5 max-w-md shadow-sm">
+        <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 flex items-center gap-2.5 max-w-md shadow-2xs">
           <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
           <span>
-            <strong>Official Notice:</strong> Exam date for CET 2027 remains unannounced. 
-            The 13 April 2027 target is our internal preparation deadline, never a confirmed exam date.
+            <strong>Official notice:</strong> Exam date for CET 2027 remains unannounced. 
+            The 13 April 2027 target is our internal preparation benchmark.
           </span>
         </div>
       </div>
@@ -100,13 +96,13 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
         ].map((p, idx) => (
           <div 
             key={idx}
-            className={`p-3.5 rounded-2xl border transition-all ${
+            className={`p-3.5 rounded-2xl border transition-colors ${
               p.active 
                 ? 'bg-ink-900 text-parchment-50 border-ink-800 shadow-soft' 
-                : 'bg-parchment-50 text-ink-700 border-parchment-200 opacity-75'
+                : 'bg-white text-ink-700 border-parchment-200'
             }`}
           >
-            <div className={`text-[10px] font-bold uppercase tracking-wider ${p.active ? 'text-terracotta-400' : 'text-ink-500'}`}>
+            <div className={`text-[11px] font-medium ${p.active ? 'text-terracotta-300' : 'text-ink-500'}`}>
               {p.phase}
             </div>
             <div className="font-serif font-bold text-sm mt-0.5 leading-snug">{p.name}</div>
@@ -117,7 +113,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
 
       {/* Week Selector Chips */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-ink-700 uppercase tracking-wider block">
+        <label className="text-xs font-semibold text-ink-700 block">
           Navigate Week Curriculum:
         </label>
         <div className="flex items-center gap-2 overflow-x-auto py-1">
@@ -125,10 +121,10 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
             <button
               key={w.weekNumber}
               onClick={() => setSelectedWeekNumber(w.weekNumber)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedWeekNumber === w.weekNumber 
-                  ? 'bg-terracotta-500 text-white shadow-soft' 
-                  : 'bg-parchment-100 hover:bg-parchment-200 text-ink-800'
+                  ? 'bg-terracotta-500 text-white shadow-soft font-semibold' 
+                  : 'bg-parchment-100 hover:bg-parchment-200 text-ink-800 border border-parchment-200'
               }`}
             >
               Week {w.weekNumber} {w.isCurrentWeek ? "(Current)" : ""}

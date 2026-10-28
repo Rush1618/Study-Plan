@@ -98,12 +98,8 @@ export const SyllabusView: React.FC<SyllabusViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-terracotta-600 mb-1">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Official MAH-MBA/MMS-CET 2027 Syllabus & Resources</span>
-          </div>
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
-            Syllabus & Uploaded Study Material
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
+            Syllabus & Study Material
           </h1>
           <p className="text-sm text-ink-700 mt-1">
             Official CET weightage breakdown with section-wise topics and study notes uploaded by Rushabh.
@@ -111,26 +107,28 @@ export const SyllabusView: React.FC<SyllabusViewProps> = ({
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex items-center bg-parchment-100 p-1 rounded-2xl border border-parchment-300">
+        <div className="flex items-center bg-parchment-100 p-1 rounded-xl border border-parchment-300">
           <button
             onClick={() => setActiveTab('syllabus')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               activeTab === 'syllabus'
-                ? 'bg-ink-900 text-white shadow-soft'
+                ? 'bg-ink-900 text-white shadow-sm'
                 : 'text-ink-700 hover:text-ink-900'
             }`}
           >
-            📋 Official Syllabus ({completedTopics}/{totalTopics} Mastered)
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Official Syllabus ({completedTopics}/{totalTopics})</span>
           </button>
           <button
             onClick={() => setActiveTab('notes')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               activeTab === 'notes'
-                ? 'bg-ink-900 text-white shadow-soft'
+                ? 'bg-ink-900 text-white shadow-sm'
                 : 'text-ink-700 hover:text-ink-900'
             }`}
           >
-            📚 Uploaded Notes ({documents.length} Docs)
+            <FileText className="w-3.5 h-3.5" />
+            <span>Uploaded Notes ({documents.length})</span>
           </button>
         </div>
       </div>
@@ -261,8 +259,8 @@ export const SyllabusView: React.FC<SyllabusViewProps> = ({
                               </h3>
                             </div>
                             {topic.keyNotes && (
-                              <p className="text-xs text-ink-600 pl-0.5">
-                                💡 <em>Note:</em> {topic.keyNotes}
+                              <p className="text-xs text-ink-600 pl-0.5 mt-1">
+                                <span className="font-medium text-ink-800">Note: </span>{topic.keyNotes}
                               </p>
                             )}
                           </div>

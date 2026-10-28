@@ -121,15 +121,15 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
   };
 
   return (
-    <div className={`space-y-8 animate-fadeIn transition-all ${isZenMode ? 'max-w-3xl mx-auto py-4' : ''}`}>
+    <div className={`space-y-6 sm:space-y-8 animate-fadeIn transition-colors ${isZenMode ? 'max-w-3xl mx-auto py-4' : ''}`}>
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-parchment-200">
         <div>
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-ink-900">
-            Distraction-Free Focus Room
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
+            Focus Room
           </h1>
-          <p className="text-sm text-ink-700 mt-1">
+          <p className="text-xs sm:text-sm text-ink-700 mt-1">
             Immersive concept lesson, worked examples, and calibrated focus timer for {profile.name}.
           </p>
         </div>
@@ -146,14 +146,14 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({
       {/* Focus Timer Card */}
       <div className="p-6 sm:p-8 rounded-3xl bg-ink-900 text-parchment-50 border border-ink-800 shadow-elevated flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="space-y-1 text-center sm:text-left">
-          <div className="text-xs text-terracotta-400 font-bold uppercase tracking-wider">
+          <div className="text-xs text-terracotta-300 font-medium">
             Active Study Block: {currentLesson.topic}
           </div>
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-white">
             {currentLesson.title}
           </h2>
           <div className="text-xs text-parchment-300">
-            Target: {currentLesson.durationMinutes} Minutes • Zero Distractions
+            Target: {currentLesson.durationMinutes} Minutes / Zero Distractions
           </div>
         </div>
 

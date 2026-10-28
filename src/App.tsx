@@ -5,6 +5,10 @@ import { McqEngine } from './components/McqEngine';
 import { SyllabusView } from './components/SyllabusView';
 import { FocusModeView } from './components/FocusModeView';
 import { MentorDashboard } from './components/MentorDashboard';
+import { MistakeNotebook } from './components/MistakeNotebook';
+import { AIMemoryView } from './components/AIMemoryView';
+import { RoadmapView } from './components/RoadmapView';
+import { CompanionView } from './components/CompanionView';
 import { StudyCompanionDrawer } from './components/StudyCompanionDrawer';
 import { CloudSyncModal } from './components/CloudSyncModal';
 import { UserProfile, TopicMastery, MistakeRecord, PracticeMode, SupabaseSyncConfig } from './types';
@@ -71,20 +75,35 @@ export const App: React.FC = () => {
         syncStatus={supabaseConfig.syncStatus}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content Area: pb-mobile-nav ensures bottom nav bar never covers mobile actions */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-mobile-nav lg:pb-8">
         
-        {/* 1. Daily Plan */}
+        {/* 1. Daily Plan & Sanctuary Focus */}
         {currentTab === 'daily' && (
           <DailyPlanView
             profile={profile}
             onStartPractice={(topic) => handleStartPractice('topic', { topic })}
             onStartFocus={() => handleTabChange('focus')}
-            onOpenCompanion={handleOpenCompanionWithPrompt}
+            onOpenCompanion={(prompt) => {
+              if (prompt) {
+                handleOpenCompanionWithPrompt(prompt);
+              } else {
+                handleTabChange('companion');
+              }
+            }}
           />
         )}
 
-        {/* 2. MCQ Practice & Question Bank */}
+        {/* 2. Personal AI Companion Sanctuary */}
+        {currentTab === 'companion' && (
+          <CompanionView
+            profile={profile}
+            mistakes={mistakes}
+            onStartPractice={handleStartPractice}
+          />
+        )}
+
+        {/* 3. MCQ Practice & Question Bank */}
         {currentTab === 'mcq' && (
           <McqEngine
             profile={profile}
@@ -93,7 +112,15 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* 3. Official Syllabus & Uploaded Materials */}
+        {/* 3. Mistake Notebook & Parallel Calibration (Re-homed) */}
+        {currentTab === 'mistakes' && (
+          <MistakeNotebook
+            onStartParallelTest={(_id) => handleStartPractice('mistake_redo')}
+            onOpenCompanion={handleOpenCompanionWithPrompt}
+          />
+        )}
+
+        {/* 4. Official Syllabus & Uploaded Materials */}
         {currentTab === 'syllabus' && (
           <SyllabusView
             profile={profile}
@@ -102,7 +129,15 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* 4. Focus Room */}
+        {/* 5. 24-Week Strategic Roadmap (Re-homed) */}
+        {currentTab === 'roadmap' && (
+          <RoadmapView
+            profile={profile}
+            onOpenCompanion={handleOpenCompanionWithPrompt}
+          />
+        )}
+
+        {/* 6. Focus Room */}
         {currentTab === 'focus' && (
           <FocusModeView
             profile={profile}
@@ -124,7 +159,12 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* 5. Mentor Dashboard (when role is Mentor) */}
+        {/* 7. AI Memory Transparency Center (Re-homed) */}
+        {currentTab === 'memory' && (
+          <AIMemoryView />
+        )}
+
+        {/* 8. Mentor Dashboard */}
         {currentTab === 'mentor' && (
           <MentorDashboard
             profile={profile}
@@ -136,7 +176,7 @@ export const App: React.FC = () => {
 
       </main>
 
-      {/* Socratic Study Companion Drawer */}
+      {/* Socratic Study Companion Drawer (Mobile Bottom Sheet / Desktop Drawer) */}
       <StudyCompanionDrawer
         isOpen={isCompanionOpen}
         onClose={() => setIsCompanionOpen(false)}
@@ -157,16 +197,16 @@ export const App: React.FC = () => {
         onProfileReset={handleProfileReset}
       />
 
-      {/* Editorial Footer */}
-      <footer className="border-t border-parchment-200 bg-parchment-100/60 py-8 px-4 text-center text-xs text-ink-500 font-sans">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Editorial Sanctuary Footer */}
+      <footer className="border-t border-parchment-200 bg-parchment-100/60 py-6 px-4 text-center text-xs text-ink-700 font-sans pb-mobile-nav lg:pb-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-ink-800 text-sm">Her Study Space</span>
-            <span>•</span>
-            <span>MAH-MBA/MMS-CET 2027 Personalized Prep for {profile.name}</span>
+            <span className="font-serif font-bold text-ink-900 text-sm">Her Study Space</span>
+            <span className="text-ink-400">/</span>
+            <span>MAH-MBA/MMS-CET 2027 Sanctuary for {profile.name}</span>
           </div>
-          <div className="text-[11px] text-ink-400">
-            Target: 13 April 2027 (Date Provisional) • Asia/Kolkata Timezone
+          <div className="text-[11px] text-ink-600">
+            Target: 13 April 2027 (Date Provisional) / Asia/Kolkata Timezone
           </div>
         </div>
       </footer>

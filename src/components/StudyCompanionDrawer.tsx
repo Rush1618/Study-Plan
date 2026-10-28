@@ -10,7 +10,9 @@ import {
   HelpCircle, 
   BookOpen, 
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  RotateCcw,
+  Calendar
 } from 'lucide-react';
 import { UserProfile, Question, MistakeRecord } from '../types';
 import { AIProvider } from '../services/aiProvider';
@@ -201,21 +203,24 @@ export const StudyCompanionDrawer: React.FC<StudyCompanionDrawerProps> = ({
       <div className="p-3 bg-parchment-100 border-t border-parchment-200 flex items-center gap-2 overflow-x-auto text-[11px]">
         <button
           onClick={() => handleSendPrompt("Why did my percentage accuracy drop?")}
-          className="px-2.5 py-1 rounded-lg bg-white border border-parchment-300 text-ink-800 whitespace-nowrap hover:border-terracotta-500 transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-parchment-300 text-ink-800 whitespace-nowrap hover:border-terracotta-500 transition-colors"
         >
-          💡 Why did percentage accuracy drop?
+          <Sparkles className="w-3 h-3 text-terracotta-600" />
+          <span>Why did percentage accuracy drop?</span>
         </button>
         <button
           onClick={() => handleSendPrompt("Explain circular seating inward/outward rule in Hinglish")}
-          className="px-2.5 py-1 rounded-lg bg-white border border-parchment-300 text-ink-800 whitespace-nowrap hover:border-terracotta-500 transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-parchment-300 text-ink-800 whitespace-nowrap hover:border-terracotta-500 transition-colors"
         >
-          🔄 Circular seating in Hinglish
+          <RotateCcw className="w-3 h-3 text-ink-600" />
+          <span>Circular seating in Hinglish</span>
         </button>
         <button
           onClick={() => handleSendPrompt("What should she study today?")}
-          className="px-2.5 py-1 rounded-lg bg-white border border-parchment-300 text-ink-800 whitespace-nowrap hover:border-terracotta-500 transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-parchment-300 text-ink-800 whitespace-nowrap hover:border-terracotta-500 transition-colors"
         >
-          📅 What should I study today?
+          <Calendar className="w-3 h-3 text-sage-600" />
+          <span>What should I study today?</span>
         </button>
       </div>
 

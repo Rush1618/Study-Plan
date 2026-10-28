@@ -97,7 +97,7 @@ export const MistakeNotebook: React.FC<MistakeNotebookProps> = ({
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
               selectedCategory === cat 
                 ? 'bg-ink-900 text-parchment-50 shadow-sm' 
                 : 'bg-parchment-100 hover:bg-parchment-200 text-ink-700'
@@ -119,7 +119,7 @@ export const MistakeNotebook: React.FC<MistakeNotebookProps> = ({
           return (
             <div 
               key={mistake.id}
-              className={`p-6 sm:p-8 rounded-3xl border transition-all ${
+              className={`p-6 sm:p-8 rounded-3xl border transition-colors ${
                 mistake.resolved 
                   ? 'bg-parchment-50 border-sage-200 opacity-80' 
                   : 'bg-white border-parchment-200 shadow-soft'

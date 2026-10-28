@@ -85,9 +85,9 @@ export const AIMemoryView: React.FC = () => {
       </div>
 
       {/* Transparency Architecture Principle Card */}
-      <div className="p-6 rounded-3xl bg-ink-900 text-parchment-100 border border-ink-800 shadow-elevated space-y-3">
-        <div className="flex items-center gap-2 text-xs font-bold text-terracotta-400 uppercase tracking-wider">
-          <ShieldCheck className="w-4 h-4" />
+      <div className="p-5 sm:p-6 rounded-2xl bg-ink-900 text-parchment-100 border border-ink-800 shadow-elevated space-y-2.5">
+        <div className="flex items-center gap-2 text-xs font-semibold text-terracotta-300">
+          <ShieldCheck className="w-4 h-4 text-terracotta-400" />
           <span>Our Ethical Memory Guarantee</span>
         </div>
         <p className="text-xs sm:text-sm text-parchment-200/90 leading-relaxed font-sans max-w-3xl">
@@ -98,20 +98,20 @@ export const AIMemoryView: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
         <button
           onClick={() => setFilterType('all')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap ${
             filterType === 'all' 
               ? 'bg-ink-900 text-parchment-50 shadow-sm' 
               : 'bg-parchment-100 text-ink-700 hover:bg-parchment-200'
           }`}
         >
-          All Recorded Memories ({memories.length})
+          All Memories ({memories.length})
         </button>
         <button
           onClick={() => setFilterType('observed_fact')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap ${
             filterType === 'observed_fact' 
               ? 'bg-ink-900 text-parchment-50 shadow-sm' 
               : 'bg-parchment-100 text-ink-700 hover:bg-parchment-200'
@@ -121,7 +121,7 @@ export const AIMemoryView: React.FC = () => {
         </button>
         <button
           onClick={() => setFilterType('ai_hypothesis')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap ${
             filterType === 'ai_hypothesis' 
               ? 'bg-ink-900 text-parchment-50 shadow-sm' 
               : 'bg-parchment-100 text-ink-700 hover:bg-parchment-200'
@@ -132,14 +132,14 @@ export const AIMemoryView: React.FC = () => {
       </div>
 
       {/* Memories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {filtered.map((item) => {
           const isFact = item.type === 'observed_fact';
 
           return (
             <div
               key={item.id}
-              className={`p-6 rounded-3xl border transition-all flex flex-col justify-between ${
+              className={`p-5 sm:p-6 rounded-2xl border transition-colors flex flex-col justify-between ${
                 isFact 
                   ? 'bg-white border-parchment-200 shadow-soft' 
                   : 'bg-parchment-50 border-terracotta-200 shadow-soft'
@@ -147,7 +147,7 @@ export const AIMemoryView: React.FC = () => {
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-medium ${
                     isFact 
                       ? 'bg-sage-100 text-sage-800 border border-sage-200' 
                       : 'bg-terracotta-100 text-terracotta-800 border border-terracotta-200'
